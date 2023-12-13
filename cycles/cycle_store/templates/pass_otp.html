@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+   Otp Verification
+{% endblock %} 
+
+{% block content %}
+   <!-- contact section start -->
+   <!-- contact section start -->
+   <div class="contact_section layout_padding">
+      <div class="container">
+         <div class="contact_main">
+            <h1 class="request_text">Confirm your Account-to set new password</h1>
+            <p class="nav-link">Check the inbox of your email - {{email}} -and enter the Otp  </p>
+            <form action="{% url 'pass_otp_verification' %}" method="POST">
+                {% csrf_token %}
+               <div class="form-group">
+                  <input type="text" class="email-bt" placeholder="Ente the OTP" name="otp">
+               </div>
+               <button type="submit" class="btn btn-primary btn-block mb-4 ">
+                Verify
+              </button>
+            </form>
+            
+         </div>
+      </div>
+   </div> 
+{% endblock %}

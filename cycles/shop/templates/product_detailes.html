@@ -1,0 +1,161 @@
+<!-- product_detail.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container m-3">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>{{ product.category.name }} {{ product.name }}</h1>
+            <div class="big-image-container p-1 geeks">
+                <img id="big-image" src="{{ product.productimage_set.first.image.url }}" alt="{{ product.name }} Image">
+            </div>
+            <div class="additional-images">
+                {% for image in product.productimage_set.all %}
+                    <div class="small-square">
+                        <img src="{{ image.image.url }}" alt="{{ product.name }} Image" onclick="changeBigImage('{{ image.image.url }}')">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6 py-5">
+            <h3><b>{{ product.category.name }} {{ product.name }}</b></h3>
+            <h3><b>{{ product.brand.name }}</b></h3>
+            <p>{{ product.description }}</p>
+            <p>Size: {{ product.get_size_display }}</p>
+            {% if variants %}
+                <p><strong>Select Brake Type:</strong></p>
+                <form method="post" action="{% url 'add_to_cart' 0 %}" id="brakeForm">
+                    {% csrf_token %}
+                    {% for variant in variants %}
+                        <label>
+                            <input type="radio" name="brake_type" value="{{ variant.id }}" data-price="{{ variant.price }}" data-stock-quantity="{{ variant.stock_quantity }}" id="brake_type_{{ variant.id }}">
+                            {{ variant.brake }}
+                        </label><br>
+                    {% endfor %}
+                    {%if product.offer%}
+                    <p><strong>Actual Price:</strong> <strike><span id="selectedPrice"></span></strike></p>
+                    <p><strong><span id="discountedPrice=product.offer.percentage">Offer Price<span id="selectedDiscountedPrice"></span></span></strong></p>
+                    {%else%}
+                    <p><strong>Price:</strong> <span id="selectedPrice"></span></p>
+                    {%endif%}
+                    <button type="submit" class="btn btn-primary" id="addToCartButton" disabled>
+                        <i class="fas fa-shopping-cart"></i> ADD TO CART
+                    </button>
+                </form>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<style>
+    .button-with-border {
+        border: 1px solid #000;
+    }
+
+    .big-image-container {
+        position: relative;
+        width: 100%;
+    }
+
+    #big-image {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+
+    .additional-images {
+        display: flex;
+    }
+
+    .small-square {
+        width: 80px;
+        height: 80px;
+        margin-right: 10px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .small-square img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+<style>
+    .geeks {
+        width: 450px;
+        height: 300px;
+        overflow: hidden;
+        margin: 0 auto;
+    }
+
+    .geeks img {
+        width: 100%;
+        transition: 0.5s all ease-in-out;
+    }
+
+    .geeks:hover img {
+        transform: scale(1.5);
+    }
+</style>
+
+{% if product.offer %}
+    <script>
+        var offerPercentage = {{ product.offer.percentage }};
+    </script>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var form = document.getElementById("brakeForm");
+        var addToCartButton = document.getElementById("addToCartButton");
+        var selectedPrice = document.getElementById("selectedPrice");
+        var selectedDiscountedPrice = document.getElementById("selectedDiscountedPrice");
+
+        form.addEventListener("change", function () {
+            var selectedVariant = document.querySelector('input[name="brake_type"]:checked');
+            if (selectedVariant) {
+                // Update form action with the selected variant ID
+                form.action = "{% url 'add_to_cart' 0 %}".replace("0", selectedVariant.value);
+
+                var price = selectedVariant.getAttribute("data-price");
+                var stockQuantity = selectedVariant.getAttribute("data-stock-quantity");
+                var discountPercentage = {{ product.offer.percentage|default:"0" }};
+
+                console.log("Price:", price);
+                console.log("Stock Quantity:", stockQuantity);
+                console.log("Discount Percentage:", discountPercentage);
+
+                if (stockQuantity <= 0) {
+                    addToCartButton.disabled = true;
+                    selectedPrice.textContent = "Out of Stock";
+                    selectedDiscountedPrice.textContent = "";
+                } else {
+                    addToCartButton.disabled = false;
+                    selectedPrice.textContent = "Price: ₹ " + price;
+
+                    // Check if there is an offer
+                    if (discountPercentage > 0) {
+                        // Calculate discounted price
+                        var discountedPrice = price - (price * (discountPercentage / 100));
+                        selectedDiscountedPrice.textContent = "Offer Price: ₹" + discountedPrice.toFixed(2);
+                    } else {
+                        // No offer, display regular price
+                        selectedDiscountedPrice.textContent = "";
+                    }
+                }
+            } else {
+                addToCartButton.disabled = true;
+                selectedPrice.textContent = "";
+                selectedDiscountedPrice.textContent = "";
+            }
+        });
+    });
+</script>
+
+{% endblock %}

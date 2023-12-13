@@ -1,0 +1,264 @@
+
+{% load static %} 
+
+{% block title %}
+   Checkout
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <br><br>
+    <br><br>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong> Please correct the errors below.
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                <li>{{ field }}: {{ errors|join:", " }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    {% if not Addresses_exist %}
+                    <div class="container">
+                        <h4>Add Your Shipping Address</h4>
+                        <form action="{% url 'checkout' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" name="first_name" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="text" name="phone" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" name="address" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" name="city" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" name="state" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="country">Country</label>
+                                    <input type="text" name="country" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="pincode">Pin Code</label>
+                                    <input type="text" name="pincode" class="form-control"required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary"> Save </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <h4 class="card-title mb-4">Billing Address</h4>
+                    <form action="{% url 'place_order' %}" method="post" id="checkoutForm">
+                        {% csrf_token %}
+                        {% for address in Addresses %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="billing_address_option" id="billing_address_{{ address.id }}" value="{{ address.id }}" {% if address.status %}checked{% endif %}>
+                            <label class="form-check-label" for="billing_address_{{ address.id }}">
+                                {{ address.first_name }} {{ address.last_name }} - {{ address.address }}, {{ address.city }}, {{ address.state }}, {{ address.country }} - {{ address.pincode }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addAddress">
+                            Add New Address
+                        </button>    
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart summary -->
+        <div class="col-md-6">
+            <div class="cart-body" style="border: 1px solid #d4d0d0; padding: 20px;">
+                <h4 class="text-center text-success">Your Bycycles</h4>
+            <br>
+            
+            <!-- Cart items table -->
+            <table class="table table-card">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th class="px-4">Quantity</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cart_item in cart_items %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <div style="flex: 0 0 100px;">
+                                    <a href="{% url 'product_detail' cart_item.product.id %}">
+                                        <img src="{{ cart_item.product.productimage_set.first.image.url }}" alt="Product 1" class="img-thumbnail" style="max-width: 100px;">
+                                    </a>    
+                                </div>
+                                <div style="margin-left: 10px;">
+                                    <b>{{ cart_item.product.category }} {{ cart_item.product.name }}</b>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="py-3">
+                            <span class="text-dark">₹{{ cart_item.sub_total }}</span>
+                            <br>
+                            {% if cart_item.product.offer %}
+                            <br>
+                            <small class="text-muted">₹ {{ cart_item.discount_amount }} eacheach</small>
+                            {%else%} 
+                            <br>
+                            <small class="text-muted">₹ {{ cart_item.variation.price }} each</small>   
+                            {% endif %}                                </td>
+                        <td class="py-1">
+                        <div class="text-center" >
+                            <span class="text-dark text-center" > {{ cart_item.quantity }} </span>  
+                        </div>        
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                    <!-- Add more cart items as needed -->
+                </tbody>
+            </table>
+            <div class="form-group">
+                <label>Payment Method(Choose Your Preference):</label><br>
+                <input type="radio" name="payment_method" value="Cash On Delivery" id="COD" required>
+                <label for="size_s">Cash On Delivery</label><br>
+                <input type="radio" name="payment_method" value="Razorpay" id="razorpay" required>
+                <label for="size_s">Razorpay</label>&nbsp;&nbsp;&nbsp;<br>
+                {%if wallet%}
+                <input type="radio" name="payment_method" value="Wallet" id="wallet" required>
+                <label for="size_s">Wallet</label>&nbsp;&nbsp;&nbsp;
+                {% endif %}
+            </div>
+            
+            <button type="button" class="btn btn-primary text-light" onclick="validateBillingAddress()">Place Order</button>
+            <a href="{% url 'shop' %}" class="btn btn-warning text-light">Continue Shopping</a>
+            </div>
+        </form>
+        </div>
+        <div class="modal" id="addAddress">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Your New Shipping Address</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+        
+                    <!-- Modal Body -->
+                    <form class="modal-body" action="{% url 'checkout' %}" method="post">
+                        {% csrf_token %}
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="modalFirstName">First Name</label>
+                                    <input type="text" name="first_name"class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="modalLastName">Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="modalEmail">Email</label>
+                                    <input type="email" name="email" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="modalPhone">Phone Number</label>
+                                    <input type="text" name="phone"  class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="modalAddress">Address</label>
+                                    <input type="text" name="address" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="modalCity">City</label>
+                                    <input type="text" name="city" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="modalState">State</label>
+                                    <input type="text" name="state" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col form-group">
+                                    <label for="modalCountry">Country</label>
+                                    <input type="text"  name="country" class="form-control" required>
+                                </div>
+                                <div class="col form-group">
+                                    <label for="modalPincode">Pin Code</label>
+                                    <input type="text" name="pincode" class="form-control">
+                                </div>
+                            </div>
+        
+                            <!-- Modal Footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary"> Save </button>
+                            </div>
+                    </form>    
+        
+                </div>
+            </div>
+        </div>    
+    </div>
+</div> 
+            
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function validateBillingAddress() {
+        var radioButtons = document.querySelectorAll('input[name="billing_address_option"]');
+        var isSelected = Array.from(radioButtons).some(function (radioButton) {
+            return radioButton.checked;
+        });
+
+        if (!isSelected) {
+            Swal.fire({
+                icon: 'info',
+                title: 'No Addresses Found',
+                text: 'Please add a new shipping address.',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            // If an address is selected, proceed with the form submission
+            document.getElementById('checkoutForm').submit();
+        }
+    }
+</script>
+
+{% endblock %}
