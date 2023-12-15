@@ -38,8 +38,8 @@
                         </label><br>
                         {% endfor %}
                         {% if product.offer %}
-                            <p><strong>Actual Price:</strong> <strike><span id="selectedPrice"></span></strike></p>
-                            <p><strong><span id="discountedPrice=product.offer.percentage">Offer Price<span id="selectedDiscountedPrice"></span></span></strong></p>
+                            <p><strike><span id="selectedPrice"></span></strike></p>
+                            <p><strong><span id="discountedPrice=product.offer.percentage"><span id="selectedDiscountedPrice"></span></span></strong></p>
                         {% else %}
                             <p><strong>Price:</strong> <span id="selectedPrice"></span></p>
                         {% endif %}
@@ -155,7 +155,7 @@
                     selectedDiscountedPrice.textContent = "";
                 } else {
                     addToCartButton.disabled = false;
-                    selectedPrice.textContent = "Price: ₹ " + price;
+                    selectedPrice.textContent = "Actual Price:: ₹ " + price;
 
                     // Check if there is an offer
                     if (discountPercentage > 0) {
