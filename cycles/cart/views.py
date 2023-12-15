@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from orders.models import ShippingAddress, Wallet
 from product.models import Product, ProductVarient
-from cart.models import Cart,CartItem
+from cart.models import Cart,CartItem,Wishlist
 from django.utils import timezone
 from django.urls import reverse
 from orders.forms import OrderForm, ShippingAddressForm
@@ -229,5 +229,22 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
        
 
     return render(request, 'checkout.html', context)
+
+@login_required
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    print(wishlist_items)
+    for item in wishlist_items:
+        
+        print('..................details',item.product.category)
+    return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
+
+@login_required
+def add_to_wishlist(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+    if not Wishlist.objects.filter(user=request.user, product=product).exists():
+        Wishlist.objects.create(user=request.user, product=product)  
+    return redirect('wishlist')
 
 

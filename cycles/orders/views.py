@@ -1,12 +1,11 @@
-from datetime import timezone
-import queue
+from django.utils import timezone 
 import random
 import string
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib import messages,auth
+from django.contrib import messages
 from django.urls import reverse
 from cart.models import CartItem
-from product.models import Coupon, Product, ProductVarient
+from product.models import Coupon,ProductVarient
 from .forms import OrderForm, ShippingAddressForm, UserForm
 from .models import Order, OrderItem, ShippingAddress, Wallet
 from django.contrib.auth.models import User
@@ -15,6 +14,8 @@ from django.db.models import Q
 
 import razorpay
 from django.conf import settings
+
+from django.contrib.auth import get_user
 
 
 def place_order(request, total=0, quantity=0):
@@ -128,6 +129,7 @@ def payment(request, quantity=0):
                             (Q(min_purchase_amount__lte=total) | Q(min_purchase_amount__isnull=True)) &
                             (Q(max_purchase_amount__gte=total) | Q(max_purchase_amount__isnull=True))
                         ).exists()
+
             if coupon_exist:
                 coupons = Coupon.objects.filter(
                             Q(is_active=True) &
@@ -138,24 +140,19 @@ def payment(request, quantity=0):
 
     return render(request, 'payment.html', context)
 
-def apply_coupon(request,order_id):
-    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>............apply_coupon')
-    
+def apply_coupon(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    print(order.user)
-    
+
     if request.method == 'POST':
-        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>............apply_coupon.................POST')
-
         coupon_code = request.POST.get('coupon')
-        try:  
-            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>............apply_coupon.................POST       try')
+        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>coupon_code is:', coupon_code)
 
-            coupon = Coupon.objects.get(code=coupon_code)
-            
+        try:
+            coupon = Coupon.objects.get(id=coupon_code, is_active=True)
+
             if coupon.valid_upto < timezone.now():
                 messages.error(request, 'Coupon has expired.', extra_tags='danger')
-            elif order.get_cart_total < coupon.min_purchase_amount:
+            elif order.total_amount < coupon.min_purchase_amount:
                 messages.error(request, f'Amount should be greater than {coupon.min_purchase_amount}', extra_tags='danger')
             elif not coupon.is_user_eligible(request.user):
                 messages.error(request, 'You have already used this coupon.', extra_tags='danger')
@@ -164,12 +161,14 @@ def apply_coupon(request,order_id):
             else:
                 order.applied_coupon = coupon
                 order.save()
+                coupon.mark_as_used(request.user)
                 messages.success(request, 'Coupon successfully applied.', extra_tags='success')
 
         except Coupon.DoesNotExist:
             messages.error(request, 'Invalid coupon code. Please try again.', extra_tags='danger')
 
-    return redirect('payment') 
+    return redirect('payment')
+
 
 def remove_coupon(request,order_id):
     order = get_object_or_404(Order, id=order_id)

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from cart.models import CartItem
+from cart.models import CartItem, Wishlist
 from product.models import Product,ProductImage,Category, ProductVarient
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
@@ -28,8 +28,14 @@ def shop(request):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+    if request.user.is_authenticated:
+        wishlist_items = Wishlist.objects.filter(user=request.user)
+        wishlist_product_ids = wishlist_items.values_list('product__id', flat=True)
+    else:
+        wishlist_product_ids = []  # If the user is not authenticated, handle it accordingly
+     
 
-    return render(request, 'shop.html', {'products': products})
+    return render(request, 'shop.html', {'products': products,'wishlist_product_ids':wishlist_product_ids})
 
 def product_detail(request, product_id):
     product = Product.objects.get(pk=product_id)
@@ -47,7 +53,7 @@ def product_detail(request, product_id):
         'variants': variants,
         'in_cart': in_cart
     }
-
+    
     return render(request, 'product_detailes.html', context)
 
 

@@ -1,6 +1,8 @@
 from django.db import  models
 
 from adminpanel.models import User,Offers
+from django.utils.functional import SimpleLazyObject
+from django.contrib.auth import get_user_model
 
 
 
@@ -88,8 +90,17 @@ class Coupon(models.Model):
         """
         Mark the coupon as used by a specific user.
         """
+        UserModel = get_user_model()
+
+        if isinstance(user, SimpleLazyObject):
+            user._setup()  # Ensure the lazy object is fully initialized
+            user = user._wrapped
+
+        if not isinstance(user, UserModel):
+            user = UserModel.objects.get(pk=user.pk)    
+
         self.used_by.add(user)
-        self.save()   
+        self.save()  
 
 
     
