@@ -111,6 +111,12 @@
 {% endif %}
 
 <script>
+
+    function changeBigImage(imageUrl) {
+            var bigImage = document.getElementById("big-image");
+            bigImage.src = imageUrl;
+        }
+
     document.addEventListener("DOMContentLoaded", function () {
         var form = document.getElementById("brakeForm");
         var addToCartButton = document.getElementById("addToCartButton");
