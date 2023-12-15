@@ -26,26 +26,38 @@
             <p>{{ product.description }}</p>
             <p>Size: {{ product.get_size_display }}</p>
             {% if variants %}
-                <p><strong>Select Brake Type:</strong></p>
-                <form method="post" action="{% url 'add_to_cart' 0 %}" id="brakeForm">
-                    {% csrf_token %}
-                    {% for variant in variants %}
+                {% if variants.count > 1 %}
+                    <p><strong>Select Brake Type:</strong></p>
+                    <form method="post" action="{% url 'add_to_cart' 0 %}" id="brakeForm">
+                        {% csrf_token %}
+                        {% for variant in variants %}
                         <label>
-                            <input type="radio" name="brake_type" value="{{ variant.id }}" data-price="{{ variant.price }}" data-stock-quantity="{{ variant.stock_quantity }}" id="brake_type_{{ variant.id }}">
+                            <input type="radio" name="brake_type" value="{{ variant.id }}" data-price="{{ variant.price }}" data-stock-quantity="{{ variant.stock_quantity }}" id="brake_type_{{ variant.id }}"
+                            {% if forloop.first %}checked{% endif %}>
                             {{ variant.brake }}
                         </label><br>
-                    {% endfor %}
-                    {%if product.offer%}
-                    <p><strong>Actual Price:</strong> <strike><span id="selectedPrice"></span></strike></p>
-                    <p><strong><span id="discountedPrice=product.offer.percentage">Offer Price<span id="selectedDiscountedPrice"></span></span></strong></p>
-                    {%else%}
-                    <p><strong>Price:</strong> <span id="selectedPrice"></span></p>
-                    {%endif%}
-                    <button type="submit" class="btn btn-primary" id="addToCartButton" disabled>
+                        {% endfor %}
+                        {% if product.offer %}
+                            <p><strong>Actual Price:</strong> <strike><span id="selectedPrice"></span></strike></p>
+                            <p><strong><span id="discountedPrice=product.offer.percentage">Offer Price<span id="selectedDiscountedPrice"></span></span></strong></p>
+                        {% else %}
+                            <p><strong>Price:</strong> <span id="selectedPrice"></span></p>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary" id="addToCartButton" disabled>
+                            <i class="fas fa-shopping-cart"></i> ADD TO CART
+                        </button>
+                    </form>
+                {% else %}
+                    <!-- Render something else when there's only one variant -->
+                    <p><strong>Type of Brake:</strong>  {{ variants.first.brake }}</p>
+                    <p><strong>Price:</strong> ₹ {{ variants.first.price }}</p>
+                    <p><strong>Stock Quantity:</strong> {{ variants.first.stock_quantity }}</p>
+                    <a href="{% url 'add_to_cart' variants.first.id %}" class="btn btn-primary" >
                         <i class="fas fa-shopping-cart"></i> ADD TO CART
-                    </button>
-                </form>
+                    </a>
+                {% endif %}
             {% endif %}
+
             
         </div>
     </div>
