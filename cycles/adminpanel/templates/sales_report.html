@@ -281,64 +281,59 @@
         </li><!-- End Dashboard Nav -->
         <li class="nav-heading">Pages</li>
           <!-- ======= Sidebar ======= -->
-    
-
-        
-
+          <li class="nav-item">
+            <a class="nav-link collapsed" href="{%url 'customers'%}">
+              <i class=" bi bi-people bi bi-people bi bi-people"></i>
+              <span>Customers</span>
+            </a>
+          </li><!-- End Customers Page Nav -->
+  
+          <li class="nav-item">
+            <a class="nav-link collapsed" href="{%url 'products'%}">
+              <i class="bi bi-cart"></i>
+              <span>Products</span>
+            </a>
+          </li><!-- End Product Page Nav -->
+  
         <li class="nav-item">
-          <a class="nav-link collapsed" href="users-profile.html">
-            <i class="bi bi-person"></i>
-            <span>Profile</span>
+          <a class="nav-link collapsed" href="{%url 'order'%}">
+            <i class="bi bi-card-list"></i>
+            <span>Order Detailes</span>
           </a>
-        </li><!-- End Profile Page Nav -->
-
+        </li><!-- End Order Detailes Page Nav -->
+  
         <li class="nav-item">
-          <a class="nav-link collapsed" href="{%url 'customers'%}">
-            <i class=" bi bi-people bi bi-people bi bi-people"></i>
-            <span>Customers</span>
+          <a class="nav-link collapsed" href="{% url 'coupon' %}">
+            <i class="bi bi-currency-dollar"></i>
+            <span>Coupons</span>
           </a>
-        </li><!-- End Customers Page Nav -->
-
+        </li><!-- End Coupons Nav -->
         <li class="nav-item">
-          <a class="nav-link collapsed" href="{%url 'products'%}">
-            <i class="bi bi-cart"></i>
-            <span>Products</span>
+          <a class="nav-link collapsed" href="{% url 'offers' %}">
+            <i>₹</i>
+            <span>Offers</span>
           </a>
-        </li><!-- End Product Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{%url 'order'%}">
-          <i class="bi bi-card-list"></i>
-          <span>Order Detailes</span>
-        </a>
-      </li><!-- End Order Detailes Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-login.html">
-          <i class="bi bi-currency-dollar"></i>
-          <span>Coupons</span>
-        </a>
-      </li><!-- End Coupons Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{% url 'category'%}">
-          <i class="bi bi-list"></i>
-          <span>Category</span>
-        </a>
-      </li><!-- End Category Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{% url 'brand'%}">
-          <i class="bi bi-file-earmark"></i>
-          <span>Brand</span>
-        </a>
-      </li><!-- End Varient Page Nav --> 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="{% url 'adminlogout'%}">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Logout</span>
-        </a>
-      </li><!-- End Login Page Nav -->
+        </li>
+  
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'category'%}">
+            <i class="bi bi-list"></i>
+            <span>Category</span>
+          </a>
+        </li><!-- End Category Page Nav -->
+  
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'brand'%}">
+            <i class="bi bi-file-earmark"></i>
+            <span>Brand</span>
+          </a>
+        </li><!-- End Varient Page Nav --> 
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="{% url 'adminlogout'%}">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Logout</span>
+          </a>
+        </li><!-- End Login Page Nav -->
 
     </ul>
 
