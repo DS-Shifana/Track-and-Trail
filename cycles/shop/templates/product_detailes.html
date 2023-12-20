@@ -3,6 +3,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}
+   Product Detailes
+{% endblock %}
+
 {% block content %}
 
 <div class="container m-3">
@@ -46,6 +50,15 @@
                         <button type="submit" class="btn btn-primary" id="addToCartButton" disabled>
                             <i class="fas fa-shopping-cart"></i> ADD TO CART
                         </button>
+                        {% if user.is_authenticated %}
+                        {% if product.id not in wishlist_product_ids %}
+                        <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-success text-light">
+                            <i class="fas fa-heart "></i> ADD TO WISHLIST
+                        </a>
+                        {%else%}
+                            <i class="fas fa-heart text-danger"> Wishlist Item</i>
+                        {%endif%}
+                        {%endif%}
                     </form>
                 {% else %}
                     <!-- Render something else when there's only one variant -->
@@ -55,6 +68,15 @@
                     <a href="{% url 'add_to_cart' variants.first.id %}" class="btn btn-primary" >
                         <i class="fas fa-shopping-cart"></i> ADD TO CART
                     </a>
+                    {% if user.is_authenticated %}
+                        {% if product.id not in wishlist_product_ids %}
+                        <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-success text-light">
+                            <i class="fas fa-heart "></i> ADD TO WISHLIST
+                        </a>
+                        {%else%}
+                            <i class="fas fa-heart text-danger"> Wishlist Item</i>
+                        {%endif%}
+                    {%endif%}
                 {% endif %}
             {% endif %}
 

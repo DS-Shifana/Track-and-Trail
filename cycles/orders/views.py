@@ -4,6 +4,7 @@ import string
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from cart.models import CartItem
 from product.models import Coupon,ProductVarient
 from .forms import OrderForm, ShippingAddressForm, UserForm
@@ -17,7 +18,7 @@ from django.conf import settings
 
 from django.contrib.auth import get_user
 
-
+@login_required(login_url='user_login')
 def place_order(request, total=0, quantity=0):
     current_user = request.user
     cart_items = CartItem.objects.filter(user=current_user)
@@ -62,7 +63,7 @@ def place_order(request, total=0, quantity=0):
 
     return redirect('checkout')
 
-
+@login_required(login_url='user_login')
 def payment(request, quantity=0):
     current_user = request.user
     
@@ -139,7 +140,7 @@ def payment(request, quantity=0):
                 context['coupons']=coupons
 
     return render(request, 'payment.html', context)
-
+@login_required(login_url='user_login')
 def apply_coupon(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
@@ -169,7 +170,7 @@ def apply_coupon(request, order_id):
 
     return redirect('payment')
 
-
+@login_required(login_url='user_login')
 def remove_coupon(request,order_id):
     order = get_object_or_404(Order, id=order_id)
     order.applied_coupon = None
@@ -182,7 +183,7 @@ def remove_coupon(request,order_id):
 
 
 # ------PROFILE---------
-
+@login_required(login_url='user_login')
 def profile(request):
 
     if request.user.is_authenticated:
@@ -207,7 +208,7 @@ def edit_profile(request):
     return render(request, 'edit_profile.html', {'form': form})
 
 # CHANGE PASSWORD
-
+@login_required(login_url='user_login')
 def change_password(request):
     if request.method == 'POST':
         current_user = request.user
@@ -230,7 +231,7 @@ def change_password(request):
     return redirect('profile')
 
 # ------ADDRESS------
-
+@login_required(login_url='user_login')
 def my_address(request): 
 
     current_user = request.user.id
@@ -244,7 +245,7 @@ def my_address(request):
 
 
 
-# @login_required
+@login_required(login_url='user_login')
 def add_address(request):
     if request.method == 'POST':
         print("POST request received")
@@ -264,12 +265,14 @@ def add_address(request):
 
     return render(request, 'address.html', {'form': form})
 
+@login_required(login_url='user_login')
 def edit_address(request, address_id):
     address = get_object_or_404(ShippingAddress, id=address_id)
     form = ShippingAddressForm(instance=address)
     
     return render(request, 'Editaddress.html', {'address': address, 'form': form})
 
+@login_required(login_url='user_login')
 def update_address(request, address_id):
     existing_address = get_object_or_404(ShippingAddress, id=address_id)
 
@@ -293,7 +296,7 @@ def update_address(request, address_id):
 
     return render(request, 'Editaddress.html', context)
 
-
+@login_required(login_url='user_login')
 def remove_address(request, address_id):
     address = get_object_or_404(ShippingAddress, id=address_id)
     address.delete()
@@ -302,7 +305,7 @@ def remove_address(request, address_id):
 
     return redirect('my_address')
 
-
+@login_required(login_url='user_login')
 def my_orders(request):
     orders = Order.objects.filter(user=request.user).prefetch_related('orderitem_set__product') 
 
@@ -314,7 +317,7 @@ def my_orders(request):
 
 
 
-
+@login_required(login_url='user_login')
 def cancel_order(request, order_item_id):
     if request.method == 'POST':
         order_item = get_object_or_404(OrderItem, id=order_item_id)
@@ -334,7 +337,7 @@ def cancel_order(request, order_item_id):
 
     return redirect('my_orders')
 
-
+@login_required(login_url='user_login')
 def order_success(request):
     order_id = request.GET.get('order_id')
     order = Order.objects.get(razor_pay_order_id = order_id,is_ordered=False)
@@ -347,6 +350,7 @@ def order_success(request):
     return render(request,'order_success.html')
 
 #wallet
+@login_required(login_url='user_login')
 def wallet(request):
     try:
         user_wallet = Wallet.objects.get(user=request.user)
@@ -364,6 +368,7 @@ def wallet(request):
 
     return render(request,'wallet.html',{'wallet':wallet})
 
+@login_required(login_url='user_login')
 def orderby_wallet(request):
 
     total_price = request.GET.get('total_price')

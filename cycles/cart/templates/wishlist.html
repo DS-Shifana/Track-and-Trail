@@ -3,7 +3,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div >
+    <div>
         <h2 class="text-center">Wishlist</h2>
     </div>
   
@@ -27,9 +27,14 @@
               </div>
             </div>
             <div class="row mt-3">
-                <div class="col-md-6">
-                    <a href="{% url 'product_detail' item.product.id %}" class="btn btn-info">Know More</a>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'product_detail' item.product.id %}" class="btn btn-info">Know More</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="{% url 'delete_from_wishlist' item.product.id %}" class="btn btn-danger">Remove</a>
                 </div>
+              </div>
+            
+            
               <div class="col-md-6">
                 
               </div>

@@ -12,11 +12,18 @@ from cart.views import _cart_id
 
 def shop(request):
     query = request.GET.get('query', '')  # Get the 'query' parameter from the request
+    category = request.GET.get('category', '') 
+
 
     products = Product.objects.filter(is_availability=True).order_by('id')
 
     if query:
         products = products.filter(category__name__icontains=query)
+    
+
+    if category:
+
+        products = products.filter(category__name__icontains=category)
 
 
     paginator = Paginator(products, 9)  
@@ -47,11 +54,17 @@ def product_detail(request, product_id):
         in_cart = CartItem.objects.filter(cart__cart_id=_cart_id(request), product=product).exists()
 
     variants = ProductVarient.objects.filter(product=product)
+    if request.user.is_authenticated:
+        wishlist_items = Wishlist.objects.filter(user=request.user)
+        wishlist_product_ids = wishlist_items.values_list('product__id', flat=True)
+    else:
+        wishlist_product_ids = [] 
 
     context = {
         'product': product,
         'variants': variants,
-        'in_cart': in_cart
+        'in_cart': in_cart,
+        'wishlist_product_ids':wishlist_product_ids
     }
     
     return render(request, 'product_detailes.html', context)

@@ -25,8 +25,10 @@ def add_to_cart(request, variant_id):
     current_user = request.user
 
     if current_user.is_authenticated:
+        wishlist_items = Wishlist.objects.filter(user=request.user)
         try:
             cart= Cart.objects.get(user=current_user)
+
         except Cart.DoesNotExist:
             cart = Cart.objects.create(user=current_user,cart_id=_cart_id(request))
             cart.save()
@@ -37,6 +39,7 @@ def add_to_cart(request, variant_id):
             cart_item.quantity += 1
             variation.stock_quantity -= 1
             variation.save()
+            wishlist_items.filter(product=product).delete()        
             cart_item.save()
         else:
             cart_item = CartItem.objects.create(
@@ -51,9 +54,11 @@ def add_to_cart(request, variant_id):
             variation.save()
             cart_item.save()
         return redirect('cart')
+        
 
 
     else:
+        wishlist_product_ids = []
         try:
             cart = Cart.objects.get(cart_id=_cart_id(request))
         except Cart.DoesNotExist:
@@ -230,7 +235,7 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
 
     return render(request, 'checkout.html', context)
 
-@login_required
+@login_required(login_url='user_login')
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     print(wishlist_items)
@@ -239,12 +244,21 @@ def wishlist(request):
         print('..................details',item.product.category)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
-@login_required
+@login_required(login_url='user_login')
 def add_to_wishlist(request, product_id):
 
     product = get_object_or_404(Product, id=product_id)
     if not Wishlist.objects.filter(user=request.user, product=product).exists():
         Wishlist.objects.create(user=request.user, product=product)  
+    return redirect('shop')
+@login_required(login_url='user_login')
+def delete_from_wishlist(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+    wishlist_item = Wishlist.objects.filter(user=request.user,product=product)
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',wishlist_item)
+    wishlist_item.delete()
     return redirect('wishlist')
+
 
 
