@@ -28,12 +28,31 @@ from orders.models import Wallet
 def custom_404(request, exception):
     return render(request, '404.html', status=404)
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @never_cache
 def home(request):
-    # users = User.objects.all()
-    # usernames = [user.username for user in users]
-    return render(request,'index.html')
+    try:
+        # ... (any existing code)
+
+        logger.info("Before line 36")
+        # ... (code before line 36)
+
+        # Content of line 36
+        # ...
+
+        logger.info("After line 36")
+        # ... (code after line 36)
+
+        # ... (any existing code)
+
+    except Exception as e:
+        logger.error(f"Error in home view: {e}")
+        # Handle the exception as needed
+
+    return render(request, 'index.html')
 
 @never_cache
 def user_login(request):
