@@ -10,6 +10,18 @@
    <div class="contact_section layout_padding">
       <div class="container">
          <div class="contact_main">
+            <div class="row d-flex justify-content-center">
+               <div class="col-lg-8">
+                 {% if messages %}
+                   <div class="message-box text-danger ">
+                     {% for message in messages %}
+                       <div class="alert alert-{{ message.tags }}">
+                         {{ message }}
+                       </div>
+                     {% endfor %}
+                   </div>
+                 {% endif %}
+              </div>  
             <h1 class="request_text">Confirm your Account</h1>
             <p class="nav-link">Check the inbox of your email - {{email}} -and enter the Otp  </p>
             <form action="{%url 'otp_verification'%}" method="POST">
