@@ -33,7 +33,6 @@ def custom_404(request, exception):
 def home(request):
     users = User.objects.all()
     usernames = [user.username for user in users]
-    print('aaaaaaaaaaaaaaaaa',request.user)
     return render(request,'index.html',{'usernames': usernames})
 
 @never_cache
