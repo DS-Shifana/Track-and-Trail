@@ -163,7 +163,6 @@ def varient(request,id=None):
     
 
     product = Product.objects.get(id=product_id)
-    print("kkkkkkkkkkkkkkkkkkkk",product.id)
 
     if request.method == 'POST':
         print(id)
@@ -182,7 +181,6 @@ def varient(request,id=None):
 
 def edit_varient(request,varient_id):
     varient = ProductVarient.objects.get(id = varient_id)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>",varient)
 
     return render(request,'edit_varient.html',{'varient':varient})
 

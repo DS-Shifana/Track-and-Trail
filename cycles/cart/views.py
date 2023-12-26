@@ -181,7 +181,6 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
     Addresses_exist = Addresses.exists()
 
     if request.method == 'POST':
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.Form Post")
         form = ShippingAddressForm(request.POST)
         if form.is_valid():
             print("Form is valid")
@@ -191,10 +190,8 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
             address.save()
             return redirect(reverse('checkout'))
         else:
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.Form is not valid")
             print(form.errors)
     else:
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.Form  not Post")
         form = ShippingAddressForm()
 
     try:
@@ -237,11 +234,10 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
 
 @login_required(login_url='user_login')
 def wishlist(request):
+
     wishlist_items = Wishlist.objects.filter(user=request.user)
     print(wishlist_items)
-    for item in wishlist_items:
         
-        print('..................details',item.product.category)
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 
 @login_required(login_url='user_login')
@@ -256,7 +252,6 @@ def delete_from_wishlist(request, product_id):
 
     product = get_object_or_404(Product, id=product_id)
     wishlist_item = Wishlist.objects.filter(user=request.user,product=product)
-    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',wishlist_item)
     wishlist_item.delete()
     return redirect('wishlist')
 

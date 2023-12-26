@@ -178,10 +178,7 @@ def otp_verification(request):
             user = User(username=request.session['username'], email=request.session['email'], password=encryptedpassword)
             user.first_name = request.session.get("fname")
             user.last_name = request.session.get("lname")
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>referral_code",request.session.get("referral_code"))
-
             user.referral_code = request.session.get("referral_code")
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>referral_code............user.referral_code",user.referral_code)
             def generate_referral_code(request,length=18):
                 characters = string.ascii_letters + string.digits
                 random_code = ''.join(random.choice(characters) for i in range(length))

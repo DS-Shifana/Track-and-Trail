@@ -146,7 +146,6 @@ def apply_coupon(request, order_id):
 
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon')
-        print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>coupon_code is:', coupon_code)
 
         try:
             coupon = Coupon.objects.get(id=coupon_code, is_active=True)
