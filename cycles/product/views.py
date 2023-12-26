@@ -31,7 +31,7 @@ def add_element(request):
     categories = Category.objects.filter(is_deleted=False) 
     brands = Brand.objects.filter(is_deleted=False) 
     offers = Offers.objects.filter(is_active = True)
-    print(offers)
+    
  
     context = {
         'categories': categories,
@@ -54,8 +54,6 @@ def add_product(request):
         brand = Brand.objects.get(pk=brand_id)
         offer = Offers.objects.get(pk=offer_id)
 
-        
-        
         product=Product(name = name,
         description = description,
         category = category,
@@ -67,14 +65,8 @@ def add_product(request):
         
         images = request.FILES.getlist('image')
 
-
-        # Handle image deletions
-        
-
         for image in images:
             ProductImage.objects.create(product=product,image=image)
-
-        
         return redirect('products')
 
     return render(request, 'your_template.html')
@@ -160,13 +152,11 @@ def list(request, id):
 def varient(request,id=None):
     if id is not None: 
         product_id = id
-    
 
     product = Product.objects.get(id=product_id)
 
     if request.method == 'POST':
-        print(id)
-
+        
         form = ProductVariantForm(request.POST)
 
         if form.is_valid():
