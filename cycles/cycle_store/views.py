@@ -31,9 +31,9 @@ def custom_404(request, exception):
 
 @never_cache
 def home(request):
-    users = User.objects.all()
-    usernames = [user.username for user in users]
-    return render(request,'index.html',{'usernames': usernames})
+    # users = User.objects.all()
+    # usernames = [user.username for user in users]
+    return render(request,'index.html')
 
 @never_cache
 def user_login(request):
@@ -115,7 +115,6 @@ def signup(request):
         pass2 = request.POST.get('pass2')
         referral_code = request.POST.get('referrel_code')
 
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>referral_code signup",referral_code)
         request.session['fname'] = fname
         request.session['lname'] = lname
         request.session['username']=username
