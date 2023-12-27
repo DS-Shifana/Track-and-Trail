@@ -31,7 +31,7 @@
                <div class="col-md-4">
                   <div class="product" style="width: 300px; height: 400px;">
                     <a href="{% url 'product_detail' product.id %}">
-                     <div class="image-container" style="width: 300px; height: 300px;">
+                     <div class="image-container" style="width: 200px; height: 200px;">
                         <img src="{{ product.productimage_set.first.image.url }}" alt="{{ product.name }} Image" >
                      </div>
                      <h3><b><u>{{ product.category.name }} {{ product.name }}</b></u></h3></a> 

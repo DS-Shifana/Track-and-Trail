@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-^i2zm-r8y7knbs$wjj*w^hc2r+*#dn377$q$l(&tm%pv71u%er
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['trackandtrails.shop']
 
 APPEND_SLASH = False
 
