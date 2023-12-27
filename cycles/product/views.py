@@ -52,7 +52,10 @@ def add_product(request):
         
         category = Category.objects.get(pk=category_id)
         brand = Brand.objects.get(pk=brand_id)
-        offer = Offers.objects.get(pk=offer_id)
+        if offer_id:
+            offer = Offers.objects.get(pk=offer_id)
+        else:
+            offer = None    
 
         product=Product(name = name,
         description = description,
