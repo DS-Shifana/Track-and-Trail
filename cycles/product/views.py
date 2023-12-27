@@ -347,7 +347,7 @@ def brand_delete(request,id):
     brand = get_object_or_404(Brand, id=id)
     brand.is_deleted = True
     brand.save()
-    Product.objects.filter(brand=category).update(is_availability=False)
+    Product.objects.filter(brand=brand).update(is_availability=False)
 
     return redirect('brand')
 
