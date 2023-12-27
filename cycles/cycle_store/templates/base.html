@@ -24,26 +24,30 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 <!-- Magnify CSS and JS -->
-<link rel="stylesheet" type="text/css" href="path-to-magnify.css">
+<link rel="stylesheet" type="text/css" href="path-to-magnify.css"> 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="path-to-magnify.js"></script>
+
+<!-- In your template -->
+<link rel="stylesheet" href="{% static 'user/css/style.css' %}">
+
 
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Custom CSS -->
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'user/css/style.css' %}">
 
 <!-- Responsive CSS -->
-<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/responsive.css' %}">
 
 <!-- Scrollbar Custom CSS -->
-<link rel="stylesheet" href="{% static 'css/jquery.mCustomScrollbar.min.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/jquery.mCustomScrollbar.min.css' %}">
 
 <!-- Owl Carousel CSS -->
-<link href="https://fonts.googleapis.com/css?family=Poppins:400,700|Raleway:400,700,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+<link href="https://fonts.googleapis.com/user/css?family=Poppins:400,700|Raleway:400,700,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'user/css/owl.carousel.min.css' %}">
+<link rel="stylesheet" href="{% static 'user/css/owl.theme.default.min.css' %}">
 
 <!-- Fancybox CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
@@ -73,7 +77,7 @@
    <div class="header_section header_bg">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
          <a href="index.html" class="logo">
-            <img src="{% static 'images/logo.jpg' %}" style="width: 100px; height: auto;">
+            <img src="{% static 'user/images/logo.jpg' %}" style="width: 100px; height: auto;">
         </a>
         
          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -125,14 +129,14 @@
                     
                      <li>
                      <a href="{%url 'cart'%}" style="position: relative; display: inline-block;">
-                           <img src="{% static 'images/cart.png' %}" width="45" height="40">
+                           <img src="{% static 'user/images/cart.png' %}" width="45" height="40">
                            <span class="badge  bg-danger" style="position: absolute; top: -5px; right: -5px; width: 25px; height: 20px;">{{cart_count}}</span>
                        </a>
                        
                     </li>
                      <li>
                         <a href="{% url 'wishlist'%}">
-                           <img src="{% static 'images/whishlisticon.png' %}" width="40" height="40">
+                           <img src="{% static 'user/images/whishlisticon.png' %}" width="40" height="40">
                         </a>
                      </li>
                      
@@ -142,7 +146,7 @@
          </div>
          <div id="main">
             <span style="font-size:36px;cursor:pointer; color: #fff" onclick="openNav()"><img
-                  src="{% static 'images/menu.png' %}" style="height: 30px;"></span>
+                  src="{% static 'user/images/menu.png' %}" style="height: 30px;"></span>
          </div>
       </nav>
         <!-- banner section start -->
@@ -164,15 +168,15 @@
    <!-- copyright section end -->
    <!-- JavaScript files -->
 
-   <script src="{% static 'js/jquery.min.js' %}"></script>
-   <script src="{% static 'js/popper.min.js' %}"></script>
-   <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-   <script src="{% static 'js/plugin.js' %}"></script>
+   <script src="{% static 'user/js/jquery.min.js' %}"></script>
+   <script src="{% static 'user/js/popper.min.js' %}"></script>
+   <script src="{% static 'user/js/bootstrap.bundle.min.js' %}"></script>
+   <script src="{% static 'user/js/plugin.js' %}"></script>
    <!-- Sidebar -->
-   <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
-   <script src="{% static 'js/custom.js' %}"></script>
+   <script src="{% static 'user/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+   <script src="{% static 'user/js/custom.js' %}"></script>
    <!-- JavaScript -->
-   <script src="{% static 'js/owl.carousel.js' %}"></script>
+   <script src="{% static 'user/js/owl.carousel.js' %}"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
    <script>
       function openNav() {
@@ -189,7 +193,7 @@
          $("#navbarSupportedContent").toggleClass("nav-normal");
       });
    </script>
-   <script src="{% static 'magnific-popup/jquery.magnific-popup.min.js' %}"></script>
+   <script src="{% static 'user/magnific-popup/jquery.magnific-popup.min.js' %}"></script>
 
 </body>
 </html>

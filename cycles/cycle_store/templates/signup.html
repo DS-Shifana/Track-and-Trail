@@ -11,33 +11,33 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
    <!-- site metas -->
-   <title>News</title>
+   <title>signup</title>
    <meta name="keywords" content="">
    <meta name="description" content="">
    <meta name="author" content="">
    <!-- bootstrap css -->
-   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'user/css/bootstrap.min.css' %}">
    <!-- style css -->
-   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'user/css/style.css' %}">
    <!-- Responsive-->
-   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+   <link rel="stylesheet" href="{% static 'user/css/responsive.css' %}">
    <!-- fevicon -->
    <link rel="icon" href="images/fevicon.png" type="image/gif" />
    <!-- Scrollbar Custom CSS -->
-   <link rel="stylesheet" href="{% static 'css/jquery.mCustomScrollbar.min.css' %}">
+   <link rel="stylesheet" href="{% static 'user/css/jquery.mCustomScrollbar.min.css' %}">
    <!-- Tweaks for older IEs-->
    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
    <!-- owl stylesheets -->
    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700|Raleway:400,700,800&display=swap"
       rel="stylesheet">
-   <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-   <link rel="stylesoeet" href="{% static 'css/owl.theme.default.min.css' %}">
+   <link rel="stylesheet" href="{% static 'user/css/owl.carousel.min.css' %}">
+   <link rel="stylesoeet" href="{% static 'user/css/owl.theme.default.min.css' %}">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css"
       media="screen">
-      <body style="background-color: #325662;">
+  
 </head>
 
-<body>
+<body style="background-color: #325662;">
    
    <!-- Section: Design Block -->
 <section class="text-center">
@@ -58,79 +58,133 @@
           <div class="row d-flex justify-content-center">
             <div class="col-lg-8">
               <h2 class="fw-bold mb-4">Sign up now</h2>
+          
+              {% if messages %}
+              <div class="message-box text-danger ">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                  {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
               <form method='POST' action="{% url 'signup' %}">
                 {% csrf_token %}
                 <!-- 2 column grid layout with text inputs for the first and last names -->
                 <div class="row">
                   <div class="col-md-6 mb-2">
                     <div class="form-outline">
-                      <label class="form-label" for="form3Example1">First name</label>
-                      <input type="text" name='fname' id="fname" class="form-control" required/>
+                      <label class="form-label" for="fname">First name</label>
+                      <input type="text" name='fname' id="fname" class="form-control" required />
                     </div>
                   </div>
                   <div class="col-md-6 mb-2">
                     <div class="form-outline">
-                      <label class="form-label" for="form3Example2">Last name</label>
-                      <input type="text" name='lname' id="lname" class="form-control" required/>
+                      <label class="form-label" for="lname">Last name</label>
+                      <input type="text" name='lname' id="lname" class="form-control" required />
                     </div>
                   </div>
                 </div>
-                
+          
                 <div class="row">
-                    <div class="col-md-6 mb-2">
-                      <div class="form-outline">
-                      <label class="form-label" for="form3Example1">Username</label>
-                      <input type="text" name='username' id="username" class="form-control" required/>
-                      </div>
+                  <div class="col-md-6 mb-2">
+                    <div class="form-outline">
+                      <label class="form-label" for="username">Username</label>
+                      <input type="text" name='username' id="username" class="form-control" required />
                     </div>
-                    <div class="col-md-6 mb-2">
-                      <div class="form-outline">
-                      <label class="form-label" for="form3Example3">Email address</label>
-                      <input type="email" name='email' id="email" class="form-control" required/>
-                      </div>
-                    </div>
-                  </div> 
-                
-                
-                  <div class="row">
-                    <div class="col-md-6 mb-4">
-                      <div class="form-outline">
-                      <label class="form-label" for="form3Example4">Password</label>
-                      <input type="password" name="pass1" id="pass1" class="form-control" required />
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                      <div class="form-outline">
-                      <label class="form-label" for="form3Example4">Re-enterPassword</label>
-                      <input type="password" name="pass2" id="pass2" class="form-control" required />
-                      </div>
-                    </div>
-                  </div> 
-                  <div class="form-outline">
-                    <label class="form-label" for="form3Example4">If you have any refferel code,Enter the referral code</label>
-                    <input type=text name="referrel_code" >
                   </div>
-                  
-
-              
-                  {%if messages%}
-                  {%for message in messages%}
-                  <script>alert('{{message}}')</script>
-                  {% endfor %}
-                  {% endif %}
-  
-                
+                  <div class="col-md-6 mb-2">
+                    <div class="form-outline">
+                      <label class="form-label" for="email">Email address</label>
+                      <input type="email" name='email' id="email" class="form-control" required />
+                    </div>
+                  </div>
+                </div>
+          
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="pass1">Password</label>
+                      <input type="password" name="pass1" id="pass1" class="form-control" required />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="pass2">Re-enter Password</label>
+                      <input type="password" name="pass2" id="pass2" class="form-control" required />
+                    </div>
+                  </div>
+                </div>
+          
+                <div class="form-outline">
+                  <label class="form-label" for="referrel_code">Referral Code</label>
+                  <input type="text" name="referrel_code" id="referrel_code" class="form-control" placeholder="  Optional...."/>
+                </div>
+          
                 <!-- Submit button -->
-                <button type="submit" class="btn btn-primary btn-block mb- 2">
+                <button type="submit" class="btn btn-primary btn-block my-2">
                   Sign up
                 </button>
-
-                
-
-                
               </form>
             </div>
           </div>
+          
+            <!-- Add this script at the end of your HTML body, after the form -->
+<!-- Add this script at the end of your HTML body, after the form -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('form');
+    var alertBox = document.getElementById('alert-box');
+
+    form.addEventListener('submit', function(event) {
+      var fname = document.getElementById('fname').value;
+      var lname = document.getElementById('lname').value;
+      var username = document.getElementById('username').value;
+      var email = document.getElementById('email').value;
+      var pass1 = document.getElementById('pass1').value;
+      var pass2 = document.getElementById('pass2').value;
+      var referrelCode = document.getElementsByName('referrel_code')[0].value;
+
+      // Check for spaces in any of the fields
+      if (containsSpace(fname) || containsSpace(lname) || containsSpace(username) || containsSpace(email) || containsSpace(pass1) || containsSpace(pass2) || containsSpace(referrelCode)) {
+        showAlert('Please avoid spaces in any field.');
+        event.preventDefault(); // Prevent form submission
+        return;
+      }
+
+      // Password validation: should contain special characters, letters, and numbers
+      if (!isValidPassword(pass1)) {
+        showAlert('Password must contain special characters, letters, and numbers.');
+        event.preventDefault(); // Prevent form submission
+        return;
+      }
+
+      // Additional validation logic if needed
+
+      // If all validations pass, the form will be submitted
+    });
+
+    function showAlert(message) {
+      console.log('Showing alert:', message);
+      alertBox.innerText = message;
+      alertBox.style.display = 'block';
+    }
+
+    function containsSpace(value) {
+      return /\s/.test(value);
+    }
+
+    function isValidPassword(password) {
+      // Password must contain at least one special character, one letter, and one number
+      var specialChar = /[!@#$%^&*(),.?":{}|<>]/;
+      var letter = /[a-zA-Z]/;
+      var number = /\d/;
+
+      return specialChar.test(password) && letter.test(password) && number.test(password);
+    }
+  });
+</script>
+
         </div>
       </div>
 
