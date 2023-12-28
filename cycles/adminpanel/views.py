@@ -103,8 +103,9 @@ def block_customer(request, user_id):
     try:
         if request.user.is_superuser:
             user = User.objects.get(id=user_id)
-            user.is_active = False  
-            user.save()
+            if not user.is_superuser:
+                user.is_active = False  
+                user.save()
     except User.DoesNotExist:
         pass
     return redirect('customers')
