@@ -183,14 +183,14 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
     if request.method == 'POST':
         form = ShippingAddressForm(request.POST)
         if form.is_valid():
-            print("Form is valid")
+            
             address = form.save(commit=False)
             address.user_id = request.user.id
             address.status = True
             address.save()
             return redirect(reverse('checkout'))
         else:
-            print(form.errors)
+            pass
     else:
         form = ShippingAddressForm()
 
@@ -236,7 +236,7 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
 def wishlist(request):
 
     wishlist_items = Wishlist.objects.filter(user=request.user)
-    print(wishlist_items)
+    
         
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
 

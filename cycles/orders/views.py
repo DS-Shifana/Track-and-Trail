@@ -81,7 +81,6 @@ def payment(request, quantity=0):
             Addresses = orders.shipping_address
         
             is_exist_order_items = OrderItem.objects.filter(order=orders.id,user=request.user, ordered=True).exists()
-            print(is_exist_order_items)
             total = 0
             if is_exist_order_items == False :
             # Handle the exception here
@@ -187,7 +186,6 @@ def profile(request):
 
     if request.user.is_authenticated:
         profile = User.objects.get(username=request.user)
-        print(profile)
     else:
         return redirect('signup')
 
@@ -237,8 +235,7 @@ def my_address(request):
     if request.user.is_authenticated:
         
         Addresses = ShippingAddress.objects.filter(user_id = current_user)
-        print(Addresses)
-        print("iam from address")
+        
 
     return render(request,'address.html',{'Addresses':Addresses})
 
@@ -247,18 +244,17 @@ def my_address(request):
 @login_required(login_url='user_login')
 def add_address(request):
     if request.method == 'POST':
-        print("POST request received")
+        
         form = ShippingAddressForm(request.POST)
         if form.is_valid():
-            print("Form is valid")
+            
             address = form.save(commit=False)
             address.user_id = request.user.id
-            print("User:", address.user)
+            
             address.save()
             return redirect('my_address')
         else:
-            print("Form is invalid")
-            print(form.errors)
+           pass
     else:
         form = ShippingAddressForm()
 
@@ -283,7 +279,6 @@ def update_address(request, address_id):
             address.save()
             return redirect('my_address')
         else:
-            print(form.errors)
             return redirect('edit_address', address_id=address_id)
     else:
         form = ShippingAddressForm(instance=existing_address)
@@ -322,7 +317,6 @@ def cancel_order(request, order_item_id):
         order_item = get_object_or_404(OrderItem, id=order_item_id)
         order_item.status = "Cancelled"
         order_item.save()
-        print(order_item.status)
         varient_id = order_item.brake.id
         varient = ProductVarient.objects.get(id = varient_id)
         varient.stock_quantity += order_item.quantity

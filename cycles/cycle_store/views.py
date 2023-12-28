@@ -92,7 +92,7 @@ def user_login(request):
                         return redirect(nextPage)
                 except Exception as e:
                     # Log the exception for debugging purposes
-                    print(f"Error extracting 'next' parameter: {str(e)}")
+                    pass
 
                 
                 return redirect('home')
