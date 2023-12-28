@@ -237,7 +237,7 @@ def my_address(request):
         Addresses = ShippingAddress.objects.filter(user_id = current_user)
         
 
-    return render(request,'address.html',{'Addresses':Addresses})
+    return render(request,'Address.html',{'Addresses':Addresses})
 
 
 
