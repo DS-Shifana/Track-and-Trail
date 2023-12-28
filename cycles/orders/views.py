@@ -362,7 +362,7 @@ def wallet(request):
             referral_code = f"{prefix}{random_code}"
             return referral_code
 
-        wallet = Wallet.objects.create(user=request.user, amount='0', referrel_code=generate_referral_code(request))
+        wallet = Wallet.objects.create(user=request.user, amount='0', referral_code=generate_referral_code(request))
         wallet.save()
 
     return render(request,'wallet.html',{'wallet':wallet})

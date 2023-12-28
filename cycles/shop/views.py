@@ -3,6 +3,8 @@ from cart.models import CartItem, Wishlist
 from product.models import Product,ProductImage,Category, ProductVarient
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
+from django.db.models import Count
+
 from cart.views import _cart_id
 
 # Create your views here.
@@ -13,9 +15,9 @@ from cart.views import _cart_id
 def shop(request):
     query = request.GET.get('query', '')  # Get the 'query' parameter from the request
     category = request.GET.get('category', '') 
+    products = Product.objects.filter(is_availability=True).annotate(variant_count=Count('productvarient')).filter(variant_count__gt=0).order_by('id')
 
 
-    products = Product.objects.filter(is_availability=True).order_by('id')
 
     if query:
         products = products.filter(category__name__icontains=query)
