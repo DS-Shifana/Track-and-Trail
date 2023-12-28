@@ -99,11 +99,10 @@ class OrderItem(models.Model):
         return'{} {}'.format(self.order.id, self.order.tracking_no) 
 
 class Wallet(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    referral_code = models.CharField(max_length=50, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE) 
+    amount = models.FloatField(null=True,blank=True,default=0) 
+    referral_code = models.CharField(max_length=50,blank=True,null=True)  
 
     def __str__(self):
-        return f"{self.user.username}'s Wallet"
-
+        return str(self.user)  
 

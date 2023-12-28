@@ -323,7 +323,7 @@ def cancel_order(request, order_item_id):
         varient.save() 
 
         wallet = Wallet.objects.get(user = request.user)
-        wallet.amount +=order_item.price
+        wallet.amount += order_item.price
         wallet.save() 
 
         messages.success(request, 'Order canceled successfully.')
