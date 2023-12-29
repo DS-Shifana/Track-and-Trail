@@ -352,10 +352,7 @@ def order_success(request):
         order.save()
     except:
         pass
-    
-    
-
-          
+       
     return render(request,'order_success.html')
 
 #wallet

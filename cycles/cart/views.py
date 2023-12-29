@@ -36,7 +36,7 @@ def add_to_cart(request, variant_id):
         is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, user=current_user, variation=variation).exists()
         if is_cart_item_exists:
             cart_item = CartItem.objects.get(product=product, user=current_user, variation=variation)
-            cart_item.quantity += 1
+            cart_item.quantity = 1
             # variation.stock_quantity -= 1
             # variation.save()
             wishlist_items.filter(product=product).delete()        
@@ -100,13 +100,11 @@ def decrement_cartItem(request,variant_id,cart_item_id):
            cart_item    = CartItem.objects.get(product=product, variation=variation,cart=cart, id=cart_item_id)
         if cart_item.quantity > 1:
             cart_item.quantity -= 1
-            variation.stock_quantity +=1
-            variation.save()
+            
             cart_item.save() 
         else:
             cart_item.delete()
-            # variation.stock_quantity +=1
-            # variation.save()
+            
     except:
         pass   
     return redirect ('cart')  
@@ -120,7 +118,7 @@ def increment_cartItem(request, variant_id):
     else:
         cart = Cart.objects.get(cart_id=_cart_id(request))
         cart_item, _ = CartItem.objects.get_or_create(product=product,variation=variation, cart=cart)
-    if variation.stock_quantity > 0: 
+    if variation.stock_quantity > cart_item.quantity: 
         cart_item.quantity += 1
         # variation.stock_quantity -=1
         # variation.save()
@@ -247,6 +245,7 @@ def add_to_wishlist(request, product_id):
     if not Wishlist.objects.filter(user=request.user, product=product).exists():
         Wishlist.objects.create(user=request.user, product=product)  
     return redirect('shop')
+
 @login_required(login_url='user_login')
 def delete_from_wishlist(request, product_id):
 
