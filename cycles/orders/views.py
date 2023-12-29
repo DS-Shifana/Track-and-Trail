@@ -338,11 +338,22 @@ def cancel_order(request, order_item_id):
 @login_required(login_url='user_login')
 def order_success(request):
     order_id = request.GET.get('order_id')
-    order = Order.objects.get(razor_pay_order_id = order_id,is_ordered=False)
-    order.is_ordered = True
-    order.save()
-    cart_items = CartItem.objects.filter(user=request.user)
-    cart_items.delete()
+    try:
+        order = Order.objects.get(razor_pay_order_id = order_id,is_ordered=False)
+        
+        cart_items = CartItem.objects.filter(user=request.user)
+        for cart_item in cart_items:
+            if cart_item.variation.stock_quantity >= cart_item.quantity:
+                cart_item.variation.stock_quantity -= cart_item.quantity
+                cart_item.variation.save()
+        cart_items.delete()        
+
+        order.is_ordered = True
+        order.save()
+    except:
+        pass
+    
+    
 
           
     return render(request,'order_success.html')
