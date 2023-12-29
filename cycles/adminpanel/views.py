@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q,Count
+from django.contrib.auth.decorators import user_passes_test
 
 from product.models import Product, ProductVarient
 
@@ -14,9 +15,11 @@ from orders.models import Order, OrderItem
 
 
 
+def is_admin(user):
+    return user.is_authenticated and user.is_superuser
 # Create your views here.
 def adminlogin(request):
-    if 'username' not in request.session:
+    if 'username' not in request.session and request.user.is_superuser:
        
         if request.method=='POST':
             username=request.POST.get('username')
@@ -138,6 +141,7 @@ def adminlogout(request):
 
 from django.db.models import Sum
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def report(request):
     if request.method == 'POST':
         start_date_str = request.POST.get('startDate')

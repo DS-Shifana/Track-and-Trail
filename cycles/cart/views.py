@@ -37,8 +37,8 @@ def add_to_cart(request, variant_id):
         if is_cart_item_exists:
             cart_item = CartItem.objects.get(product=product, user=current_user, variation=variation)
             cart_item.quantity += 1
-            variation.stock_quantity -= 1
-            variation.save()
+            # variation.stock_quantity -= 1
+            # variation.save()
             wishlist_items.filter(product=product).delete()        
             cart_item.save()
         else:
@@ -50,8 +50,8 @@ def add_to_cart(request, variant_id):
                 variation = variation,
             )
 
-            variation.stock_quantity -= 1
-            variation.save()
+            # variation.stock_quantity -= 1
+            # variation.save()
             cart_item.save()
         return redirect('cart')
         
@@ -81,8 +81,8 @@ def add_to_cart(request, variant_id):
                 quantity=1,
                 cart=cart,
             )
-            variation.stock_quantity -= 1
-            variation.save()
+            # variation.stock_quantity -= 1
+            # variation.save()
             cart_item.save()
         return redirect(reverse('cart'))
 
@@ -105,8 +105,8 @@ def decrement_cartItem(request,variant_id,cart_item_id):
             cart_item.save() 
         else:
             cart_item.delete()
-            variation.stock_quantity +=1
-            variation.save()
+            # variation.stock_quantity +=1
+            # variation.save()
     except:
         pass   
     return redirect ('cart')  
@@ -122,8 +122,8 @@ def increment_cartItem(request, variant_id):
         cart_item, _ = CartItem.objects.get_or_create(product=product,variation=variation, cart=cart)
     if variation.stock_quantity > 0: 
         cart_item.quantity += 1
-        variation.stock_quantity -=1
-        variation.save()
+        # variation.stock_quantity -=1
+        # variation.save()
         cart_item.save()
 
     return redirect('cart')
@@ -144,8 +144,8 @@ def delete_cart(request,variant_id,cart_item_id):
 
     cart_item.delete()
 
-    variation.stock_quantity += cart_item_instance.quantity
-    variation.save()
+    # variation.stock_quantity += cart_item_instance.quantity
+    # variation.save()
 
     
     return redirect('cart')   

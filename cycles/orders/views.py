@@ -85,8 +85,12 @@ def payment(request, quantity=0):
             if is_exist_order_items == False :
             # Handle the exception here
                 cart_items = CartItem.objects.filter(user=request.user)
+
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>cart items",cart_items)
                 
                 for cart_item in cart_items:
+                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>cart cart_item",cart_item)
+
                     variation_instance = ProductVarient.objects.get(id=cart_item.variation.id)
                     quantity += cart_item.quantity
                     order_item = OrderItem.objects.create(
@@ -98,9 +102,10 @@ def payment(request, quantity=0):
                         user=request.user,
                         ordered=True
                     )
-                    
+                    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>cart order_item",order_item)
+
                     order_item.save()
-                    return redirect(reverse('payment'))
+                return redirect(reverse('payment'))
             else:        
             # To get the Quantity
                 order_items = OrderItem.objects.filter(order=orders.id,user=request.user, ordered=True)
