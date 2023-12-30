@@ -54,7 +54,7 @@ class ProductImage(models.Model):
 class ProductVarient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     brake = models.CharField(max_length=50, default='Disc Brake')
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.PositiveIntegerField(default=0)
     stock_quantity = models.PositiveIntegerField()
 
     def __str__(self):
