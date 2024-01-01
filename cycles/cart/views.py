@@ -23,6 +23,7 @@ def add_to_cart(request, variant_id):
     variation = get_object_or_404(ProductVarient, id=variant_id)
     product = variation.product
     current_user = request.user
+    product_id = variation.product.id
 
     if current_user.is_authenticated:
         wishlist_items = Wishlist.objects.filter(user=request.user)
@@ -33,27 +34,29 @@ def add_to_cart(request, variant_id):
             cart = Cart.objects.create(user=current_user,cart_id=_cart_id(request))
             cart.save()
 
-        is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, user=current_user, variation=variation).exists()
-        if is_cart_item_exists:
-            cart_item = CartItem.objects.get(product=product, user=current_user, variation=variation)
-            cart_item.quantity = 1
-            # variation.stock_quantity -= 1
-            # variation.save()
-            wishlist_items.filter(product=product).delete()        
-            cart_item.save()
-        else:
-            cart_item = CartItem.objects.create(
-                cart=cart,
-                product=product,
-                quantity=1,
-                user=current_user,
-                variation = variation,
-            )
+        if variation.stock_quantity > 0:
+            is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, user=current_user, variation=variation).exists()
+            if is_cart_item_exists:
+                cart_item = CartItem.objects.get(product=product, user=current_user, variation=variation)
+                cart_item.quantity = 1
+                # variation.stock_quantity -= 1
+                # variation.save()
+                wishlist_items.filter(product=product).delete()        
+                cart_item.save()
+            else:
+                cart_item = CartItem.objects.create(
+                    cart=cart,
+                    product=product,
+                    quantity=1,
+                    user=current_user,
+                    variation = variation,
+                )
 
-            # variation.stock_quantity -= 1
-            # variation.save()
-            cart_item.save()
-        return redirect('cart')
+                # variation.stock_quantity -= 1
+                # variation.save()
+                cart_item.save()
+            return redirect('cart')
+        return redirect('product_detail',product_id)
         
 
 
@@ -64,27 +67,31 @@ def add_to_cart(request, variant_id):
         except Cart.DoesNotExist:
             cart = Cart.objects.create(cart_id=_cart_id(request))
             cart.save()
-        is_cart_item_exists = CartItem.objects.filter(product=product, cart=cart, variant=variation).exists()
-        if is_cart_item_exists:
-            cart_item = CartItem.objects.get(product=product, cart=cart,variant=variation)
-            if cart_item:
-                item = CartItem.objects.get(product=product, variant=variation, id=variant_id)
-                item.quantity += 1
-                item.save()
+        if variation.stock_quantity is not None and variation.stock_quantity > 0:
+            
+            is_cart_item_exists = CartItem.objects.filter(product=product, cart=cart, variation=variation).exists()
+            if is_cart_item_exists:
+                cart_item = CartItem.objects.get(product=product, cart=cart,variation=variation)
+                if cart_item:
+                    item = CartItem.objects.get(product=product, variation=variation, id=variant_id)
+                    item.quantity += 1
+                    item.save()
+                else:
+                    item = CartItem.objects.create(product=product, variation=variation, quantity=1, cart=cart)
+                    item.save()
             else:
-                item = CartItem.objects.create(product=product, variant=variation, quantity=1, cart=cart)
-                item.save()
+                cart_item = CartItem.objects.create(
+                    product=product,
+                    variation=variation,
+                    quantity=1,
+                    cart=cart,
+                )
+                # variation.stock_quantity -= 1
+                # variation.save()
+                cart_item.save()
+            return redirect(reverse('cart'))
         else:
-            cart_item = CartItem.objects.create(
-                product=product,
-                variant=variation,
-                quantity=1,
-                cart=cart,
-            )
-            # variation.stock_quantity -= 1
-            # variation.save()
-            cart_item.save()
-        return redirect(reverse('cart'))
+            return redirect('product_detail', product_id)
 
 
 
