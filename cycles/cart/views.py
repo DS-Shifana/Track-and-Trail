@@ -37,8 +37,8 @@ def add_to_cart(request, variant_id):
         if variation.stock_quantity > 0:
             is_cart_item_exists = CartItem.objects.filter(cart=cart, product=product, user=current_user, variation=variation).exists()
             if is_cart_item_exists:
-                cart_item = CartItem.objects.get(product=product, user=current_user, variation=variation)
-                cart_item.quantity = 1
+                cart_item = CartItem.objects.get(cart=cart,product=product, user=current_user, variation=variation)
+                cart_item.quantity += 1
                 # variation.stock_quantity -= 1
                 # variation.save()
                 wishlist_items.filter(product=product).delete()        
@@ -73,7 +73,7 @@ def add_to_cart(request, variant_id):
             if is_cart_item_exists:
                 cart_item = CartItem.objects.get(product=product, cart=cart,variation=variation)
                 if cart_item:
-                    item = CartItem.objects.get(product=product, variation=variation, id=variant_id)
+                    item = CartItem.objects.get(product=product, variation=variation,cart =cart)
                     item.quantity += 1
                     item.save()
                 else:
@@ -144,9 +144,6 @@ def delete_cart(request,variant_id,cart_item_id):
         cart      = Cart.objects.get(cart_id=_cart_id(request))    
         cart_item = CartItem.objects.filter(product=product,variation=variation,cart=cart,id=cart_item_id)
 
-    # Get the cart item before deletion to retrieve the quantity
-    cart_item_instance = cart_item.first()
-
     cart_item.delete()
 
     # variation.stock_quantity += cart_item_instance.quantity
@@ -155,28 +152,34 @@ def delete_cart(request,variant_id,cart_item_id):
     
     return redirect('cart')   
 
-def cart(request,total=0 , quantity = 0 , cart_item= None):
+def cart(request, total=0, quantity=0, cart_item=None):
+    stock = True
     try:
         if request.user.is_authenticated:
-           cart_items   = CartItem.objects.filter(user=request.user, is_active=True)
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
         else:
-           cart         = Cart.objects.get(cart_id=_cart_id(request))
-           cart_items   = CartItem.objects.filter(cart=cart, is_active=True)
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
         total = 0.0
         for cart_item in cart_items:
-            total += cart_item.sub_total()
-            quantity += cart_item.quantity
+            if cart_item and cart_item.product:
+                total += cart_item.sub_total()
+                quantity += cart_item.quantity
+        
+
 
     except ObjectDoesNotExist:
-       cart_items = []
-        
-    context ={
-        'total' : total,
-        'quantity' : quantity,
-        'cart_items' : cart_items,
-    }        
-    
-    return render(request,'cart.html',context)
+        cart_items = []
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+    }
+
+    return render(request, 'cart.html', context)
+
 
   
 @login_required(login_url='user_login')
@@ -237,6 +240,7 @@ def checkout(request,total=0 , quantity = 0 , cart_item= None):
 
     return render(request, 'checkout.html', context)
 
+
 @login_required(login_url='user_login')
 def wishlist(request):
 
@@ -244,6 +248,7 @@ def wishlist(request):
     
         
     return render(request, 'wishlist.html', {'wishlist_items': wishlist_items})
+
 
 @login_required(login_url='user_login')
 def add_to_wishlist(request, product_id):

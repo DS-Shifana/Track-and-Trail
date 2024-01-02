@@ -35,15 +35,21 @@ class CartItem(models.Model):
         if self.product and self.product.offer:
             price = self.discount_amount()
         else:
-            price = float(self.variation.price)
-        
+            if self.variation and self.variation.price:
+                price = float(self.variation.price)
+            else:
+                # Handle the case where variation or variation.price is None
+                price = 0.0
+            
         return price * float(self.quantity)
+
 
     
     def discount_amount(self):
-        if self.product.offer:
-            return float(float(self.variation.price) - (float(self.variation.price) * (self.product.offer.percentage / 100)))
+        if self.variation and self.variation.price and self.product and self.product.offer:
+            return float(self.variation.price) - (float(self.variation.price) * (self.product.offer.percentage / 100))
         return 0.0
+
 
 
     def __str__(self):

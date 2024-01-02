@@ -99,9 +99,13 @@
             <div class="cart-summary" style="border: 1px solid #000; padding: 20px;">
                 <h3>Cart Summary</h3>
                 <p>Total Items: {{quantity}}</p>
-                <p>Total Price: ₹{{total}}</p>
+                <p>Total Price: ₹{{total}}</p> {{ stock }}
+                {%if not stock %}
                 <a href="{%url 'checkout'%}" class="btn btn-primary">Checkout</a>    <a href="{%url 'shop'%}" class="btn btn-warning text-light">Continue Shopping</a>
-
+                {%else%}
+                <div class="text-danger">Remove out-of-stock products from your cart </div>
+                <button type="button" class="btn btn-primary" disabled>Checkout</button>   <a href="{%url 'shop'%}" class="btn btn-warning text-light">Continue Shopping</a>
+                {%endif%}
             </div>
         </div>
     </div>

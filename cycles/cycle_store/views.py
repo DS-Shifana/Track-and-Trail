@@ -53,19 +53,22 @@ def user_login(request):
                         if is_cart_item_exists:
                             guest_cart_items = CartItem.objects.filter(cart=guest_cart)
                             for item in guest_cart_items:
-                                if CartItem.objects.filter(user=user, cart=user_cart.first(),product=item.product).exists():
-                                    user_cart_item =  CartItem.objects.get(cart=user_cart.first(), product = item.product)
+                                try:
+                                    existing_cart_item = CartItem.objects.get(user=user, variation=item.variation, cart=user_cart.first(), product=item.product)                                    
+                                    user_cart_item = CartItem.objects.get(cart=user_cart.first(), variation=item.variation, product=item.product)
                                     user_cart_item.quantity += item.quantity
                                     user_cart_item.save()
-                                else:
+
+                                except CartItem.DoesNotExist:
                                     new_cart_item = CartItem.objects.create(
                                         cart=user_cart.first(),
                                         product=item.product,
                                         quantity=item.quantity,
-                                        user=user
+                                        user=user,
+                                        variation=item.variation
                                     )
                                     new_cart_item.save()
-                        guest_cart.delete()
+                            guest_cart.delete()
                     else:
                         guest_cart.user = user
                         guest_cart.save()
