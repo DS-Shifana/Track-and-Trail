@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
-
+from django.contrib import messages
 from adminpanel.models import Offers
 from orders.models import Order, OrderItem
 from .models import Coupon, Product, ProductImage, Category, Brand, ProductVarient 
@@ -152,25 +152,43 @@ def list(request, id):
     return redirect('products')
 
 
-def varient(request,id=None):
-    if id is not None: 
+from django.shortcuts import render, redirect
+from .forms import ProductVariantForm
+from .models import Product
+
+def varient(request, id=None):
+    if id is not None:
         product_id = id
 
     product = Product.objects.get(id=product_id)
-
+    varients = ProductVarient.objects.filter(product=product)
+    
     if request.method == 'POST':
-        
         form = ProductVariantForm(request.POST)
 
         if form.is_valid():
-            varient = form.save(commit=False)
-            varient.product = product
-            varient.save()
-        return redirect('varient',id)    
-          
-       
-    
-    return render(request,'varient.html',{'product':product})
+            variant = form.save(commit=False)
+            if variant.brake in [v.brake for v in varients]:
+                messages.error(request, 'Same type of brake already exists')
+                return redirect('varient',id)
+            if variant.price is not None and variant.price < 0:
+                messages.error(request, 'Price should be non-negative')
+                return redirect('varient',id)
+            elif variant.stock_quantity is not None and variant.stock_quantity < 0:
+                messages.error(request, 'Stock quantity should be non-negative')      
+                return redirect('varient',id)
+            else:    
+                variant.product = product
+                variant.save()
+            return redirect('varient', id)
+        else:
+            messages.error(request, 'Form submission failed. Please check the form.')
+
+    else:
+        form = ProductVariantForm()
+
+    return render(request, 'varient.html', {'product': product, 'form': form})
+
 
 def edit_varient(request,varient_id):
     varient = ProductVarient.objects.get(id = varient_id)
@@ -183,13 +201,29 @@ def update_varient(request,id):
     if request.method == 'POST':
     
         form = ProductVariantForm(request.POST,instance=varient)
+        varients = ProductVarient.objects.filter(product=product).exclude(id=varient.id)
+
 
         if form.is_valid():
             varient = form.save(commit=False)
-            varient.product = product
-            varient.save()
-        return redirect('varient',varient.product.id)  
-
+            
+        if form.is_valid():
+            variant = form.save(commit=False)
+            if variant.brake in [v.brake for v in varients]:
+                messages.error(request, 'Same type of brake already exists')
+                return redirect('varient',varient.product.id)
+            if variant.price is not None and variant.price < 0:
+                messages.error(request, 'Price should be non-negative')
+                return redirect('varient',varient.product.id)
+            elif variant.stock_quantity is not None and variant.stock_quantity < 0:
+                messages.error(request, 'Stock quantity should be non-negative')      
+                return redirect('varient',varient.product.id)
+            else:    
+                varient.product = product
+                varient.save()
+            return redirect('varient',varient.product.id)  
+        else:
+            messages.error(request, 'Form submission failed. Please check the form.')
     
     
     return redirect('edit_varient')
@@ -199,7 +233,6 @@ def delete_varient(request,varient_id):
     varient.delete()
     product_id = varient.product.id
     return redirect('varient',product_id)
-
 
 
 
@@ -395,28 +428,30 @@ def order(request, item_id=None):
     context = {'order_items': order_items}
     return render(request, 'order.html', context)
 
-# Coupons
+
 def coupon(request):
+    
     if request.method == 'POST':
         form = CouponForm(request.POST)
         if form.is_valid():
             coupon = form.save(commit=False)
-            for coupon in coupon_True:
-                if coupon.valid_upto and coupon.valid_upto.date() < date.today():
-                    coupon.is_active = False
-                else:    
-                    coupon.is_active = True
-            coupon.save()
-            return redirect(reverse('coupon') )
-    else:
-        form = CouponForm()
-        coupon_True = Coupon.objects.filter(is_active = True)
-        for coupon in coupon_True:
             if coupon.valid_upto and coupon.valid_upto.date() < date.today():
                 coupon.is_active = False
+            else:    
+                coupon.is_active = True
+            coupon.save()  # Save each coupon after updating is_active
+            form.save()  # Save the new coupon
+            return redirect(reverse('coupon'))
+    else:
+        form = CouponForm()
+        coupon_True = Coupon.objects.filter(is_active=True)
+        for coupon_active in coupon_True:
+            if coupon_active.valid_upto and coupon_active.valid_upto.date() < date.today():
+                coupon_active.is_active = False
+            coupon_active.save()  # Save each coupon after updating is_active
         coupons = Coupon.objects.all()        
 
-    return render(request,'coupon_management.html',{'coupons':coupons,'form':form})
+    return render(request, 'coupon_management.html', {'coupons': coupons, 'form': form})
 
 def delete_coupon(request,coupon_id):
 

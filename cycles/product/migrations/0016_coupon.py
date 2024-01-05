@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                 ('valid_upto', models.DateTimeField()),
                 ('discount_amount', models.PositiveIntegerField()),
                 ('min_purchase_amount', models.PositiveIntegerField(default=0)),
-                ('max_purchase_amount', models.PositiveIntegerField(default=0)),
                 ('is_active', models.BooleanField(default=True)),
                 ('used_by', models.ManyToManyField(blank=True, to='adminpanel.user')),
             ],

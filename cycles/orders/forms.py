@@ -1,3 +1,4 @@
+from  product.models import Coupon
 from .models import Order, ShippingAddress
 from django import forms
 from django.contrib.auth.models import User
@@ -22,3 +23,8 @@ class ShippingAddressForm(forms.ModelForm):
     class Meta:
         model = ShippingAddress
         fields = ['user', 'first_name','last_name','email','phone','address','city','state','country','pincode', 'status']
+
+class CouponForm(forms.ModelForm):
+    class Meta:
+        model = Coupon
+        fields = ['code']

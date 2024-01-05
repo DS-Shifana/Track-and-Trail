@@ -11,101 +11,105 @@
         <div class="col-md-8">
             <br>
             <div class="card">
-              
                 <h4 class="card-header">Billing Address</h4>
                 <div class="card-body">
-                  <!-- <form> -->
                     <div>
-                          <p class="card-text">{{ Addresses.first_name }} {{Addresses.last_name}}</p>
-                          <p class="card-text">{{ Addresses.address }} ,{{ Addresses.city }}  </p>
-                          <p class="card-text">{{Addresses.state}}, {{ Addresses.country }}, {{Addresses.pincode}}</p>
-                          <p class="card-text">{{ Addresses.email }} </p>
-                          <p class="card-text">{{ Addresses.phone }} </p>
-                  </div>
-                
+                        <p class="card-text">{{ Addresses.first_name }} {{ Addresses.last_name }}</p>
+                        <p class="card-text">{{ Addresses.address }}, {{ Addresses.city }}</p>
+                        <p class="card-text">{{ Addresses.state }}, {{ Addresses.country }}, {{ Addresses.pincode }}</p>
+                        <p class="card-text">{{ Addresses.email }}</p>
+                        <p class="card-text">{{ Addresses.phone }}</p>
+                    </div>
                 </div>
-              </div>
-              <div class="card">
+            </div>
+            <div class="card">
                 <h4 class="card-header">Payment Method</h4>
                 <div class="card-body">
-                  <p class="card-text">{{orders.payment_method}}</p>
+                    <p class="card-text">{{ orders.payment_method }}</p>
                 </div>
-              </div>
-           
+            </div>
         </div>
-        
-        
-        <!-- Cart summary -->
+
         <div class="col-md-4 mt-4">
-            {%if coupons%}
-          <div class="card">
-            
-            <div class="card-body">
-               
-                <h5 class="card-title">Choose Coupon</h5>
-                
-                <form  id="applyCouponForm" action="{% url 'apply_coupon' order_id=orders.id %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                  
-                    <!-- List of coupons with radio buttons -->
-                    {% for coupon in coupons %}
-                   
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="coupon" id="coupon{{ coupon.id }}" value="{{ coupon.id }}">
-                            <label class="form-check-label" for="coupon{{ coupon.id }}">
-                                If you apply <b>{{ coupon.code }}</b>, you will get a discount of <strong>₹{{ coupon.discount_amount }}.</strong>
-                                <br>It will expire on {{ coupon.valid_upto }}.
-                            </label>
-                            {% if order.applied_coupon %}
-                                <div class="checkout-discount">
-                                    <input type="text" class="form-control" id="checkout-discount-input" value="{{ order.applied_coupon.code }}" readonly>
-                                    <label for="checkout-discount-input" class="text-truncate">Remove coupon? <span>Click it to remove</span></label>
-                                </div><!-- End .checkout-discount -->
-                                <a href="{% url 'remove_coupon' order.id %}" class="btn btn-success">Remove X</a>
+            {% if coupons %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Choose Coupon</h5>
+                        <ul class="list-group mb-3">
+                            {% for coupon in coupons %}
+                                <li class="list-group-item">
+                                    If you apply <b class="text-success">{{ coupon.code }}</b>, you will get a discount of <strong>₹{{ coupon.discount_amount }}.</strong>
+                                    <br>It will <span class="text-danger">expire on {{ coupon.valid_upto }}</span> .
+                                </li>
+                            {% endfor %}
+                        </ul>
+
+                        {% if orders %}
+                            <form method="post" action="{% url 'apply_coupon' orders.id %}" id="applyCouponForm">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" name="code" id="code" {%if not orders.applied_coupon%} placeholder="Apply coupon here..."{%else%}placeholder="Coupon is applied" {%endif%}>
+                                        <button type="submit" class="btn btn-primary" id="applyCouponButton">Apply</button>
+                                    </div>
+                                    <small id="couponError" class="text-danger"></small>
+                                </div>
+                            </form>
+
+                            {% if orders.applied_coupon %}
+                                <a href="{% url 'remove_coupon' orders.id %}" class="btn btn-success">{{ orders.applied_coupon.code }}</a>
                             {% endif %}
+                        {% else %}
+                            <p>No active orders found.</p>
+                        {% endif %}
+                    </div>
+                    {% if messages %}
+                <div class="message-box text-danger">
+                    <!-- <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button> -->
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
                         </div>
                     {% endfor %}
-                    <input type="hidden" name="order_id" value="{{ orders.id }}">
-
-                    <!-- Apply button -->
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-primary" id="applyCouponButton">Apply</button>
-                    </div>
-                </form>
-                 
-            </div>
+                </div>
+            {% endif %}
+                </div>
+            {% endif %}
             
-           
-        </div>
-        {%endif%}
 
-          <!-- Cart summary -->
-          <br>
-          <div class="cart-summary" style="border: 1px solid #cac5c5; padding: 20px;">
-              <p>Total Items: {{quantity}}</p>
-              <p>Total Price: ₹{{total}}</p>
-              {% if orders.payment_method == 'Cash On Delivery' %}
-              <a href="{% url 'order_success' %}" class="btn btn-primary d-flex justify-content-center">Continue with COD</a>
-              {% elif orders.payment_method == 'Razorpay' %}  
-              <button id="rzp-button1" class="btn btn-primary">Continue with Razorpay</button>
-              {% else %}
-              <a href="{% url 'orderby_wallet' %}?total_price={{ orders.total_price }}" class="btn btn-primary d-flex justify-content-center">Continue with Wallet</a>
-              {% endif %}
-              <br>
-          </div>
-      </div>
+
+            <div class="cart-summary" style="border: 1px solid #cac5c5; padding: 20px;">
+                <p>Total Items: {{ quantity }}</p>
+                <p>Total Price: ₹<span id="totalPrice">{{ total }}</span></p>
+                
+                {% if orders.payment_method == 'Cash On Delivery' %}
+                    <a href="{% url 'order_success' %}" class="btn btn-primary d-flex justify-content-center">Continue with COD</a>
+                {% elif orders.payment_method == 'Razorpay' %}
+                    <button id="rzp-button1" class="btn btn-primary">Continue with Razorpay</button>
+                {% else %}
+                    <a href="{% url 'orderby_wallet' %}?total_price={{ orders.total_price }}" class="btn btn-primary d-flex justify-content-center">Continue with Wallet</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<!-- Razorpay script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
     var options = {
         "key": "rzp_test_88wM7ApNxQbYCU",
-        "amount": "{{payment.amount}}", // Convert amount to paise
+        "amount": "{{ payment.amount }}", // Convert amount to paise
         "currency": "INR",
         "name": "Track And Trail",
         "description": "Purchase Transaction",
-        "image": "https://example.com/your_logo",
+        "image": "{% static 'path/to/your/logo.png' %}",  <!-- Replace with the actual path to your logo -->
         "order_id": "{{ payment.id }}",
         "handler": function (response) {
             window.location.href = `/orders/order_success/?razorpay_payment_id=${response.razorpay_payment_id}&razorpay_order_id=${response.razorpay_order_id}`;
@@ -119,6 +123,7 @@
             "color": "#325662"
         }
     };
+
     var rzp1 = new Razorpay(options);
 
     rzp1.on('payment.failed', function (response) {
@@ -132,37 +137,5 @@
         e.preventDefault();
     }
 </script>
-    
-<!-- SweetAlert CDN -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var applyCouponButton = document.getElementById('applyCouponButton');  // Corrected the ID
-        var applyCouponForm = document.getElementById('applyCouponForm');
-
-        applyCouponButton.addEventListener('click', function () {
-            // Check if any radio button is selected
-            var selectedCoupon = document.querySelector('input[name="coupon"]:checked');
-
-            if (!selectedCoupon) {
-                // Display SweetAlert to prompt the user to choose a coupon
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    text: 'Please choose a coupon before applying!',
-                });
-                return; // Exit the function if no coupon is selected
-            }
-
-            // Disable the button to prevent multiple clicks
-            applyCouponButton.disabled = true;
-
-            // Submit the form using traditional form submission
-            applyCouponForm.submit();
-        });
-    });
-</script>
-
 
 {% endblock %}

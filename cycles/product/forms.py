@@ -10,14 +10,18 @@ from django.core.exceptions import ValidationError
 class ProductVariantForm(forms.ModelForm):
     class Meta:
         model = ProductVarient
-        fields = ['brake', 'price','stock_quantity']
+        fields = ['brake', 'price', 'stock_quantity']
 
+    def clean_brake(self):
+        brake = self.cleaned_data['brake']
+        # Add any custom validation for brake here
+        return brake
 
 
 class CouponForm(forms.ModelForm):
     class Meta:
         model = Coupon
-        fields = ['code', 'valid_upto', 'discount_amount', 'min_purchase_amount', 'max_purchase_amount', 'is_active']
+        fields = ['code', 'valid_upto', 'discount_amount', 'min_purchase_amount', 'is_active']
 
     def clean(self):
         cleaned_data = super().clean()

@@ -159,7 +159,17 @@
     <section class="section dashboard">
         <div class="row">
             <div class="col-lg-12">
-    
+              <div class="message-box text-danger">
+                {% if messages %}
+                  <div class="message-box text-danger ">
+                      {% for message in messages %}
+                          <div class="alert alert-{{ message.tags }}">
+                              {{ message }}
+                          </div>
+                      {% endfor %}
+                  </div>
+              {% endif %}
+            </div>
               <div class="card">
                 <div class="card-body">    
                   <!-- Table with stripped rows -->
@@ -168,6 +178,7 @@
                       <tr>
                         <th scope="col">Type of Brake</th>
                         <th scope="col">Stock</th>
+                        <th scope="col">Price</th>
                         <th scope="col">Edit</th>
                         <th scope="col">Delete</th>
 
@@ -178,6 +189,7 @@
                       <tr>
                         <td>{{varient.brake}}</td>
                         <td>{{varient.stock_quantity}}</td>
+                        <td>₹{{varient.price}}</td>
                         <td>
                           <a href=" {% url 'edit_varient' varient.id %} " class="edit" data-toggle="tooltip" title="Edit"><i class="bi bi-pencil text-warning"></i></a>
                         </td>

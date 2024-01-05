@@ -24,7 +24,7 @@ urlpatterns = [
 
 
     path('apply_coupon/<int:order_id>', views.apply_coupon, name='apply_coupon'),
-    # path('remove_coupon/<int:order_id>', views.cancel_order ,name='cancel_order'),
+    path('remove_coupon/<int:order_id>', views.remove_coupon ,name='remove_coupon'),
 
 
 

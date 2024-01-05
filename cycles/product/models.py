@@ -1,5 +1,5 @@
 from django.db import  models
-
+from django.utils import timezone
 from adminpanel.models import User,Offers
 from django.utils.functional import SimpleLazyObject
 from django.contrib.auth import get_user_model
@@ -54,7 +54,7 @@ class ProductImage(models.Model):
 class ProductVarient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     brake = models.CharField(max_length=50, default='Disc Brake')
-    price = models.PositiveIntegerField(default=0)
+    price = models.FloatField(default=0)
     stock_quantity = models.PositiveIntegerField()
 
     def __str__(self):
@@ -73,34 +73,63 @@ class Coupon(models.Model):
     valid_upto = models.DateTimeField()
     discount_amount = models.PositiveIntegerField()
     min_purchase_amount = models.PositiveIntegerField(default=0)
-    max_purchase_amount = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    used_by = models.ManyToManyField(User, blank=True)  # Many-to-many relationship with users who have used the coupon
+    used_by = models.ManyToManyField(User, blank=True)
 
-    def _str_(self):
+    def __str__(self):
         return self.code
 
     def is_user_eligible(self, user):
         """
         Check if a user is eligible to use the coupon.
         """
-        return user not in self.used_by.all() 
+        return user not in self.used_by.all()
+
+    # def mark_as_used(self, user):
+    #     """
+    #     Mark the coupon as used by a specific user.
+    #     """
+    #     # Get the actual User instance from the lazy object
+    #     if isinstance(user, SimpleLazyObject):
+    #         user = user._wrapped
+
+    #     # Check if the user is already in used_by to avoid duplicates
+    #     if user not in self.used_by.all():
+    #         self.used_by.add(user)
+    #         self.save()
+    
 
     def mark_as_used(self, user):
         """
         Mark the coupon as used by a specific user.
         """
-        UserModel = get_user_model()
+        def force_instance(user):
+            """
+            Force the evaluation of a lazy object to get the actual User instance.
+            """
+            if isinstance(user, SimpleLazyObject):
+                return user._wrapped  # Access the underlying object
+            return user
+        # Get the actual User instance from the lazy object
+        user = force_instance(user)
 
-        if isinstance(user, SimpleLazyObject):
-            user._setup()  # Ensure the lazy object is fully initialized
-            user = user._wrapped
+        # Check if the user is already in used_by to avoid duplicates
+        if user not in self.used_by.all():
+            self.used_by.add(user)
+            self.save()
 
-        if not isinstance(user, UserModel):
-            user = UserModel.objects.get(pk=user.pk)    
+    def clean_used_by(self):
+        """
+        Clean up the used_by field by removing users who have not used the coupon and whose coupons have expired.
+        """
+        expired_users = self.used_by.filter(is_active=True).exclude(order__created_at__gte=timezone.now())
+        self.used_by.remove(*expired_users)
 
-        self.used_by.add(user)
-        self.save()  
-
-
-    
+    def clean_expired_coupons(self):
+        """
+        Clean up expired coupons.
+        """
+        expired_coupons = Coupon.objects.filter(is_active=True, valid_upto__lte=timezone.now())
+        expired_coupons.update(is_active=False)
+        for coupon in expired_coupons:
+            coupon.clean_used_by()

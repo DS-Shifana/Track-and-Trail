@@ -1,5 +1,5 @@
 from django.db import models
-from product.models import Product,ProductVarient
+from product.models import Coupon, Product,ProductVarient
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -10,7 +10,7 @@ class Cart(models.Model):
        
     cart_id = models.CharField(max_length=250,blank=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE, null=True ,blank=True)
-    date_added = models.DateTimeField(auto_now_add=True) 
+    date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return str(self.user) if self.cart_id else self.user.email
