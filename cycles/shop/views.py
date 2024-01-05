@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from cart.models import CartItem, Wishlist
-from product.models import Product,ProductImage,Category, ProductVarient
+from product.models import Brand, Product,ProductImage,Category, ProductVarient
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.db.models import Count
@@ -15,8 +15,10 @@ from cart.views import _cart_id
 def shop(request):
     query = request.GET.get('query', '')  # Get the 'query' parameter from the request
     category = request.GET.get('category', '') 
+    brand = request.GET.get('brand', '')
     products = Product.objects.filter(is_availability=True).annotate(variant_count=Count('productvarient')).filter(variant_count__gt=0).order_by('id')
-
+    brands = Brand.objects.all()
+    
 
 
     if query:
@@ -26,6 +28,11 @@ def shop(request):
     if category:
 
         products = products.filter(category__name__icontains=category)
+
+    if brand:
+
+       products = products.filter(brand__name__icontains=brand) 
+
 
 
     paginator = Paginator(products, 9)  
@@ -44,10 +51,11 @@ def shop(request):
         wishlist_product_ids = []  # If the user is not authenticated, handle it accordingly
      
 
-    return render(request, 'shop.html', {'products': products,'wishlist_product_ids':wishlist_product_ids})
+    return render(request, 'shop.html', {'products': products,'wishlist_product_ids':wishlist_product_ids,'brands':brands})
 
 def product_detail(request, product_id):
     product = Product.objects.get(pk=product_id)
+    
     current_user = request.user
 
     if current_user.is_authenticated:

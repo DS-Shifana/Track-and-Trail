@@ -26,53 +26,87 @@
       <div class="container">
          <h1 class="cycle_taital">Our cycle</h1>
          <p class="cycle_text">It is a long-established fact that a reader will be distracted by the text.</p>
-         <div class="row p-4">
-            {% for product in products %}
-               <div class="col-md-4">
-                  <div class="product" style="width: 300px; height: 400px;">
-                    <a href="{% url 'product_detail' product.id %}">
-                     <div class="image-container" style="width: 200px; height: 200px;">
-                        <img src="{{ product.productimage_set.first.image.url }}" alt="{{ product.name }} Image" >
-                     </div>
-                     <h3><b><u>{{ product.category.name }} {{ product.name }}</b></u></h3></a> 
-                     <div>
-                        {%if product.offer%} <span class="text-danger"> <b>{{product.offer.percentage}}% Offer</b></span>{%endif%}
-                     </div>
+         <div class="container">
+            <div class="row">
+                <!-- Left Sidebar Card -->
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">CATEGORY</h5>
+                            <ul type="disc">
+                                <li><a class="dropdown-item" href="{% url 'shop' %}">All</a></li>
+                                {% for category in categories %}
+                                <li>          
+                                    <a class="dropdown-item" href="{% url 'shop' %}?category={{ category.name }}">{{ category.name }}</a>   
+                                </li>
+                                {%endfor%}
+                            </ul>
+                            <h5 class="card-title">BRAND</h5>
+                            <ul type="disc">
+                                <li><a class="dropdown-item" href="{% url 'shop' %}">All</a></li>
+                                {% for brand in brands %}
+                                <li>          
+                                    <a class="dropdown-item" href="{% url 'shop' %}?brand={{ brand.name }}">{{ brand.name }}</a>   
+                                </li>
+                                {%endfor%}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
         
-                     <div class="buy_bt"><a href="{% url 'product_detail' product.id %}">Know More</a></div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    {% if product.id not in wishlist_product_ids %}
-                    <a href="{% url 'add_to_wishlist' product.id %}" class="far fa-heart text-dark"></a>
-                    {% else %}
-                        <i class="fas fa-heart text-danger"></i>
-                    {% endif %}
-                  </div>
-               </div>
-               <!-- Close the row and open a new row after every third product -->
-               {% if forloop.counter|divisibleby:3 %}
-                  </div>
-                  <div class="row p-5">
-               {% endif %}
-            {% endfor %}
-         </div>
-         <!-- Pagination controls -->
-         <div class="pagination">
-            <span class="step-links">        
-                {% if products.has_previous %}      
-                    <a href="?page=1">&laquo; first</a>  
-                    <a href="?page={{ products.previous_page_number }}">previous</a>
-                {% endif %}
-                     
-                <span class="current-page">
-                    Page {{ products.number }} of {{ products.paginator.num_pages }}
-                </span>
-                
-                {% if products.has_next %}
-                    <a href="?page={{ products.next_page_number }}">next</a>
-                    <a href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
-                {% endif %}
-            </span>
-         </div>
+                <!-- Product Display -->
+                <div class="col-md-9">
+                    <div class="row p-4">
+                        {% for product in products %}
+                            <div class="col-md-4">
+                                <div class="product" style="width: 300px; height: 400px;">
+                                    <a href="{% url 'product_detail' product.id %}">
+                                        <div class="image-container" style="width: 200px; height: 200px;">
+                                            <img src="{{ product.productimage_set.first.image.url }}" alt="{{ product.name }} Image">
+                                        </div>
+                                        <h3><b><u>{{ product.category.name }} {{ product.name }}</b></u></h3></a>
+                                    <div>
+                                        {% if product.offer %} <span class="text-danger"> <b>{{ product.offer.percentage }}% Offer</b></span>{% endif %}
+                                    </div>
+        
+                                    <div class="buy_bt"><a href="{% url 'product_detail' product.id %}">Know More</a></div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    {% if product.id not in wishlist_product_ids %}
+                                    <a href="{% url 'add_to_wishlist_shop' product.id  %}" class="far fa-heart text-dark"></a>
+                                    {% else %}
+                                        <i class="fas fa-heart text-danger"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Close the row and open a new row after every third product -->
+                            {% if forloop.counter|divisibleby:3 %}
+                                </div>
+                                <div class="row p-5">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!-- Pagination controls -->
+                    <div class="pagination">
+                        <span class="step-links">
+                            {% if products.has_previous %}
+                                <a href="?page=1">&laquo; first</a>
+                                <a href="?page={{ products.previous_page_number }}">previous</a>
+                            {% endif %}
+        
+                            <span class="current-page">
+                                Page {{ products.number }} of {{ products.paginator.num_pages }}
+                            </span>
+        
+                            {% if products.has_next %}
+                                <a href="?page={{ products.next_page_number }}">next</a>
+                                <a href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
       </div>
    </div>
    <script>

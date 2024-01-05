@@ -70,7 +70,7 @@
                     </a>
                     {% if user.is_authenticated %}
                         {% if product.id not in wishlist_product_ids %}
-                        <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-success text-light">
+                        <a href="{% url 'add_to_wishlist' product.id  %}" class="btn btn-success text-light">
                             <i class="fas fa-heart "></i> ADD TO WISHLIST
                         </a>
                         {%else%}

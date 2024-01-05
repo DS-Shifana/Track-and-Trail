@@ -58,6 +58,7 @@ class CartItem(models.Model):
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    variation = models.ForeignKey(ProductVarient,on_delete=models.SET_NULL,null=True,blank=True)
     
 
     def __str__(self):

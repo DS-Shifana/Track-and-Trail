@@ -16,6 +16,33 @@ def _cart_id(request):
         cart=request.session.create()
     return cart  
 
+def cart(request, total=0, quantity=0, cart_item=None):
+    stock = True
+    try:
+        if request.user.is_authenticated:
+            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+        else:
+            cart = Cart.objects.get(cart_id=_cart_id(request))
+            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
+
+        total = 0.0
+        for cart_item in cart_items:
+            if cart_item and cart_item.product:
+                total += cart_item.sub_total()
+                quantity += cart_item.quantity
+        
+
+
+    except ObjectDoesNotExist:
+        cart_items = []
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items,
+    }
+
+    return render(request, 'cart.html', context)
 
 #ADDING CART USING SESSION ID
 
@@ -41,7 +68,8 @@ def add_to_cart(request, variant_id):
                 cart_item.quantity += 1
                 # variation.stock_quantity -= 1
                 # variation.save()
-                wishlist_items.filter(product=product).delete()        
+                wishlist_items = Wishlist.objects.filter(user=request.user,product=product)  
+                wishlist_items.delete()     
                 cart_item.save()
             else:
                 cart_item = CartItem.objects.create(
@@ -152,33 +180,7 @@ def delete_cart(request,variant_id,cart_item_id):
     
     return redirect('cart')   
 
-def cart(request, total=0, quantity=0, cart_item=None):
-    stock = True
-    try:
-        if request.user.is_authenticated:
-            cart_items = CartItem.objects.filter(user=request.user, is_active=True)
-        else:
-            cart = Cart.objects.get(cart_id=_cart_id(request))
-            cart_items = CartItem.objects.filter(cart=cart, is_active=True)
 
-        total = 0.0
-        for cart_item in cart_items:
-            if cart_item and cart_item.product:
-                total += cart_item.sub_total()
-                quantity += cart_item.quantity
-        
-
-
-    except ObjectDoesNotExist:
-        cart_items = []
-
-    context = {
-        'total': total,
-        'quantity': quantity,
-        'cart_items': cart_items,
-    }
-
-    return render(request, 'cart.html', context)
 
 
   
@@ -251,18 +253,30 @@ def wishlist(request):
 
 
 @login_required(login_url='user_login')
-def add_to_wishlist(request, product_id):
+def add_to_wishlist(request, product_id=None, variant_id=None):
 
     product = get_object_or_404(Product, id=product_id)
-    if not Wishlist.objects.filter(user=request.user, product=product).exists():
-        Wishlist.objects.create(user=request.user, product=product)  
+    
+    
+    if variant_id:
+        variation = ProductVarient.objects.get(id = variant_id)
+    else:    
+        variations = ProductVarient.objects.filter(product = product)    
+        variation = variations.first()
+    
+    if not Wishlist.objects.filter(user=request.user, product=product, variation=variation).exists():
+        Wishlist.objects.create(user=request.user, product=product, variation=variation)
+    
     return redirect('shop')
 
-@login_required(login_url='user_login')
-def delete_from_wishlist(request, product_id):
 
-    product = get_object_or_404(Product, id=product_id)
-    wishlist_item = Wishlist.objects.filter(user=request.user,product=product)
+@login_required(login_url='user_login')
+def delete_from_wishlist(request, variant_id):
+
+    variation = get_object_or_404(ProductVarient, id=variant_id)
+    product = variation.product
+    wishlist_item = Wishlist.objects.filter(user=request.user,product=product,variation=variation)
+     
     wishlist_item.delete()
     return redirect('wishlist')
 

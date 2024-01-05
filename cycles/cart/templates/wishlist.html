@@ -9,7 +9,7 @@
   
   <div class="row">
     {% for item in wishlist_items %}
-      <div class="col-md-4 mb-4">
+      <div class="col-md-4 mb-4 m-5">
         <div class="card">
           <div class="card-body">
             <div class="row">
@@ -19,6 +19,8 @@
               <div class="col-md-8">
                 <h3><b><u>{{ item.product.category.name }} {{ item.product.name }}</u></b></h3>
                 <p>Size: {{ item.product.size }}</p>
+                <p>Brake : {{ item.variation.brake }}</p>
+                <p>Price:₹ {{ item.variation.price }}</p>
                 <div>
                   {% if item.product.offer %}
                     <span class="text-danger"><b>{{ item.product.offer.percentage }}% Offer</b></span>
@@ -30,7 +32,7 @@
               <div class="col-md-6">
                 <div class="d-flex justify-content-between">
                     <a href="{% url 'product_detail' item.product.id %}" class="btn btn-info">Know More</a>&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="{% url 'delete_from_wishlist' item.product.id %}" class="btn btn-danger">Remove</a>
+                    <a href="{% url 'delete_from_wishlist' item.variation.id %}" class="btn btn-danger">Remove</a>
                 </div>
               </div>
             
