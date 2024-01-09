@@ -17,6 +17,7 @@ from orders.models import Order, OrderItem
 
 def is_admin(user):
     return user.is_authenticated and user.is_superuser
+
 # Create your views here.
 def adminlogin(request):
     if 'username' not in request.session and request.user.is_superuser:
@@ -80,7 +81,8 @@ def dashboard(request,filter=None):
 
     return redirect('adminlogin')
 
-@login_required
+
+@user_passes_test(is_admin, login_url='adminlogin')
 def customers(request):
     if 'username' in request.session and request.user.is_superuser:
         user = User.objects.all()
@@ -101,7 +103,7 @@ def customers(request):
 
 
 
-@login_required
+@user_passes_test(is_admin, login_url='adminlogin')
 def block_customer(request, user_id):
     try:
         if request.user.is_superuser:
@@ -122,7 +124,7 @@ def unblock_customer(request, id):
     else:
         return redirect('customers')
 
-
+@user_passes_test(is_admin, login_url='adminlogin')
 def search(request):
     query = request.GET.get('text')
     user = User.objects.filter(Q(first_name__icontains=query) | Q(email__icontains=query) | Q(username__icontains=query))

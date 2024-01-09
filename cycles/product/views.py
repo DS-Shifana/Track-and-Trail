@@ -11,13 +11,14 @@ from django.contrib import messages
 from adminpanel.models import Offers
 from orders.models import Order, OrderItem
 from .models import Coupon, Product, ProductImage, Category, Brand, ProductVarient 
+from adminpanel.views import user_passes_test,is_admin
 
 from .forms import  CouponForm, OffersForm, ProductVariantForm
 
 
 # ----------product management start--------------
 
-
+@user_passes_test(is_admin, login_url='adminlogin')
 def products(request):
     if 'username' in request.session: 
         products = Product.objects.all()
@@ -27,6 +28,7 @@ def products(request):
         return render(request, 'products.html', context)
     return redirect('adminlogin')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def add_element(request):
     categories = Category.objects.filter(is_deleted=False) 
     brands = Brand.objects.filter(is_deleted=False) 
@@ -40,6 +42,7 @@ def add_element(request):
     }
     return render(request,'Adding_products.html',context)
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def add_product(request):
     if request.method == 'POST':
         
@@ -75,6 +78,7 @@ def add_product(request):
     return render(request, 'your_template.html')
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def edit_element(request,id):
     categories = Category.objects.all() 
     brands = Brand.objects.all()
@@ -90,6 +94,7 @@ def edit_element(request,id):
 
     return render(request,'editing.html',context)
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def update(request, id):
     
     product = get_object_or_404(Product, id=id)
@@ -138,6 +143,7 @@ def update(request, id):
 
     return render(request, 'products.html')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def unlist(request, id):
     product = get_object_or_404(Product, id=id)
     product.is_availability = False
@@ -145,6 +151,7 @@ def unlist(request, id):
     return redirect('products')
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def list(request, id):
     product = get_object_or_404(Product, id=id)
     product.is_availability = True
@@ -152,10 +159,7 @@ def list(request, id):
     return redirect('products')
 
 
-from django.shortcuts import render, redirect
-from .forms import ProductVariantForm
-from .models import Product
-
+@user_passes_test(is_admin, login_url='adminlogin')
 def varient(request, id=None):
     if id is not None:
         product_id = id
@@ -190,11 +194,13 @@ def varient(request, id=None):
     return render(request, 'varient.html', {'product': product, 'form': form})
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def edit_varient(request,varient_id):
     varient = ProductVarient.objects.get(id = varient_id)
 
     return render(request,'edit_varient.html',{'varient':varient})
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def update_varient(request,id):
     varient = ProductVarient.objects.get(id = id)
     product = varient.product
@@ -228,6 +234,7 @@ def update_varient(request,id):
     
     return redirect('edit_varient')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def delete_varient(request,varient_id):
     varient = ProductVarient.objects.get(id = varient_id)
     varient.delete()
@@ -237,6 +244,7 @@ def delete_varient(request,varient_id):
 
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def search(request):
     query = request.GET.get('query')  
     products = Product.objects.all()
@@ -256,6 +264,7 @@ def search(request):
 
  # ----------product management end--------------
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category(request):
     if 'username' in request.session:
         categories = Category.objects.all()  
@@ -265,6 +274,7 @@ def category(request):
         return render(request, 'category.html', context)
     return redirect('adminlogin')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -274,6 +284,7 @@ def category_add(request):
         return redirect('category')  
     return redirect('category')                        
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_edit(request, id):
     category = Category.objects.all()
 
@@ -283,6 +294,7 @@ def category_edit(request, id):
     }
     return render(request, 'category.html', context)
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_update(request, id):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -300,6 +312,7 @@ def category_update(request, id):
     
     return redirect(request,'category.html')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_delete(request,id):
     category = get_object_or_404(Category, id=id)
     category.is_deleted = True
@@ -309,6 +322,7 @@ def category_delete(request,id):
 
     return redirect('category')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_undelete(request,id):
     category = get_object_or_404(Category, id=id)
     category.is_deleted = False
@@ -317,6 +331,7 @@ def category_undelete(request,id):
 
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def category_search(request):
     query = request.GET.get('query')
     
@@ -334,6 +349,7 @@ def category_search(request):
 # --------------------  category_END ---------------
 
 # --------------------  BRAND ---------------
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand(request):
     if 'username' in request.session:
         brands = Brand.objects.all()  
@@ -343,6 +359,7 @@ def brand(request):
         return render(request, 'brand.html', context)
     return redirect('adminlogin')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -352,6 +369,7 @@ def brand_add(request):
         return redirect('brand')  
     return redirect('brand')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_edit(request, id):
     brand = Brand.objects.all()
     
@@ -362,6 +380,7 @@ def brand_edit(request, id):
     }
     return render(request, 'brand.html', context)
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_update(request, id):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -379,6 +398,7 @@ def brand_update(request, id):
     
     return redirect(request,'brand.html')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_delete(request,id):
     brand = get_object_or_404(Brand, id=id)
     brand.is_deleted = True
@@ -387,6 +407,7 @@ def brand_delete(request,id):
 
     return redirect('brand')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_undelete(request,id):
     brand = get_object_or_404(Brand, id=id)
     brand.is_deleted = False
@@ -395,6 +416,7 @@ def brand_undelete(request,id):
 
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def brand_search(request):
     query = request.GET.get('query')
     
@@ -412,6 +434,7 @@ def brand_search(request):
 
 
 # -----------ORDER MANAGEMNT-----------
+@user_passes_test(is_admin, login_url='adminlogin')
 def order(request, item_id=None):
     if item_id:
         if request.method == 'POST':
@@ -429,6 +452,7 @@ def order(request, item_id=None):
     return render(request, 'order.html', context)
 
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def coupon(request):
     
     if request.method == 'POST':
@@ -453,6 +477,7 @@ def coupon(request):
 
     return render(request, 'coupon_management.html', {'coupons': coupons, 'form': form})
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def delete_coupon(request,coupon_id):
 
     coupon = Coupon.objects.filter(id = coupon_id)
@@ -460,6 +485,7 @@ def delete_coupon(request,coupon_id):
     
     return redirect('coupon')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def edit_coupon(request, coupon_id=None):
     coupon = Coupon.objects.get(id=coupon_id)
 
@@ -481,6 +507,7 @@ def edit_coupon(request, coupon_id=None):
     return render(request, 'edit_coupon.html', {'coupon': coupon, 'form': form})
 
 # ------------ Offers -------------
+@user_passes_test(is_admin, login_url='adminlogin')
 def offers(request):
 
     offers = Offers.objects.all()
@@ -514,11 +541,13 @@ def offers(request):
 
     return render(request, 'offers.html',context)
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def delete_offer(request,offer_id):
     offer = Offers.objects.get(id = offer_id)
     offer.delete()
     return redirect('offers')
 
+@user_passes_test(is_admin, login_url='adminlogin')
 def edit_offer(request, offer_id):
     offer = Offers.objects.get(id=offer_id)
 

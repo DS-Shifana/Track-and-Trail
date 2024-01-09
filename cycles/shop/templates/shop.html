@@ -72,7 +72,7 @@
                                     <div class="buy_bt"><a href="{% url 'product_detail' product.id %}">Know More</a></div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     {% if product.id not in wishlist_product_ids %}
-                                    <a href="{% url 'add_to_wishlist_shop' product.id  %}" class="far fa-heart text-dark"></a>
+                                    <a href="{% url 'add_to_wishlist' product.id  %}" class="far fa-heart text-dark"></a>
                                     {% else %}
                                         <i class="fas fa-heart text-danger"></i>
                                     {% endif %}
