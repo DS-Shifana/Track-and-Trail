@@ -17,7 +17,7 @@ def _cart_id(request):
     return cart  
 
 def cart(request, total=0, quantity=0, cart_item=None):
-    stock = True
+    checkout_enable = True
     try:
         if request.user.is_authenticated:
             cart_items = CartItem.objects.filter(user=request.user, is_active=True)
@@ -30,7 +30,12 @@ def cart(request, total=0, quantity=0, cart_item=None):
             if cart_item and cart_item.product:
                 total += cart_item.sub_total()
                 quantity += cart_item.quantity
-        
+        for cart_item in cart_items:        
+                if cart_item.variation.stock_quantity == 0:
+                    checkout_enable = False
+                    break
+                else:
+                    checkout_enable = True
 
 
     except ObjectDoesNotExist:
@@ -40,6 +45,7 @@ def cart(request, total=0, quantity=0, cart_item=None):
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items,
+        'checkout_enable':checkout_enable
     }
 
     return render(request, 'cart.html', context)
@@ -66,7 +72,8 @@ def add_to_cart(request, variant_id):
             if is_cart_item_exists:
                 cart_item = CartItem.objects.get(cart=cart,product=product, user=current_user, variation=variation)
                 cart_item.quantity += 1
-                # variation.stock_quantity -= 1
+                if variation.stock_quantity == 0:
+                    checkout = True
                 # variation.save()
                 wishlist_items = Wishlist.objects.filter(user=request.user,product=product)  
                 wishlist_items.delete()     

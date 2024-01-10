@@ -30,6 +30,7 @@
                         <th>Product</th>
                         <th>Price</th>
                         <th class="px-4">Quantity</th>
+                        <th>Stock Availability</th>
                         <th>Action</th>                  
                     </tr>
                 </thead>
@@ -79,8 +80,16 @@
                                 </div>
                             </div>
                         </td>
-                        
-                        
+                        {% if cart_item.variation.stock_quantity == 0 %}
+                            <td class="py-5">
+                                <b class="text-danger">Out-of-stock</b>
+                            </td>
+                        {% else %}
+                            <td class="py-5">
+                                <i class="fa fa-circle-check text-success" aria-hidden="true"></i>
+                            </td>
+                        {% endif %}
+
 
                         <td class="py-5">
                             <a href="{% url 'delete_cart' cart_item.variation.id cart_item.id %}"><button class="btn btn-danger">Remove</button></a>
@@ -100,12 +109,15 @@
                 <h3>Cart Summary</h3>
                 <p>Total Items: {{quantity}}</p>
                 <p>Total Price: ₹{{total}}</p> {{ stock }}
-                {%if not stock %}
-                <a href="{%url 'checkout'%}" class="btn btn-primary">Checkout</a>    <a href="{%url 'shop'%}" class="btn btn-warning text-light">Continue Shopping</a>
-                {%else%}
-                <div class="text-danger">Remove out-of-stock products from your cart </div>
-                <button type="button" class="btn btn-primary" disabled>Checkout</button>   <a href="{%url 'shop'%}" class="btn btn-warning text-light">Continue Shopping</a>
-                {%endif%}
+                {% if checkout_enable == True %}
+                    <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
+                    <a href="{% url 'shop' %}" class="btn btn-warning text-light">Continue Shopping</a>
+                {% else %}
+                    <div class="text-danger">Remove out-of-stock products from your cart</div>
+                    <button type="button" class="btn btn-primary" disabled>Checkout</button>
+                    <a href="{% url 'shop' %}" class="btn btn-warning text-light">Continue Shopping</a>
+                {% endif %}
+
             </div>
         </div>
     </div>
