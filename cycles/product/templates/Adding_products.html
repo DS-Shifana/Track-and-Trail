@@ -584,7 +584,20 @@
             <div class="modal-content">
               <form action="{% url 'add' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+                <div class="message-box text-danger">
+                  {% if messages %}
+                      <div class="message-box text-danger">
+                          {% for message in messages %}
+                              <div class="alert alert-{{ message.tags }}">
+                                  {{ message }}
+                              </div>
+                          {% endfor %}
+                      </div>
+                  {% endif %}
+              </div>
+              
                 <div class="modal-body">
+                  
                   <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" name="name" class="form-control" required>

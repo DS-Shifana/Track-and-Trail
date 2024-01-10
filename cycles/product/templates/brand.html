@@ -380,6 +380,18 @@
     
           </div>
       </div>
+      <div class="message-box text-danger">
+        {% if messages %}
+            <div class="message-box text-danger ">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
       <table class="table table-striped table-hover">
         <thead>
             <tr>

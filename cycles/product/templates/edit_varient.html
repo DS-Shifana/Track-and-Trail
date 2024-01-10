@@ -147,6 +147,7 @@
                 <div class="card-header">
                     <h5 class="card-title">Edit Brake</h5>
                 </div>
+                
                 <div class="card-body">
                     <!-- Vertical Form -->
                     <form method="post" action="{% url 'update_varient' varient.id %}" class="row g-3">
@@ -163,6 +164,19 @@
                             <label for="inputEmail4" class="form-label">Stock_quantity</label>
                             <input type="number" class="form-control" name="stock_quantity" value="{{varient.stock_quantity}}" required>
                         </div>
+                        <div>
+                          <div class="message-box text-danger">
+                            {% if messages %}
+                              <div class="message-box text-danger ">
+                                  {% for message in messages %}
+                                      <div class="alert alert-{{ message.tags }}">
+                                          {{ message }}
+                                      </div>
+                                  {% endfor %}
+                              </div>
+                          {% endif %}
+                        </div>
+                            
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary">Submit</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>

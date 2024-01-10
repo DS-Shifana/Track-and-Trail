@@ -135,14 +135,22 @@ def payment(request, quantity=0):
                         ).exists()
 
             if coupon_exist:
-                coupons = Coupon.objects.filter(
-                            Q(is_active=True) &
-                            (Q(min_purchase_amount__lte=total) | Q(min_purchase_amount__isnull=True))
-                        )
-                
-                context['coupons']=coupons
+                try:
+                    user_orders = Order.objects.filter(user=request.user)
+                    applied_coupons = [order.applied_coupon for order in user_orders if order.applied_coupon]
+                    coupons = Coupon.objects.filter(
+                        Q(is_active=True) &
+                        (Q(min_purchase_amount__lte=total) | Q(min_purchase_amount__isnull=True))
+                    ).exclude(id__in=[coupon.id for coupon in applied_coupons])
+                except:
+                    coupons = Coupon.objects.filter(
+                        Q(is_active=True) &
+                        (Q(min_purchase_amount__lte=total) | Q(min_purchase_amount__isnull=True))
+                    )
+                context['coupons'] = coupons
 
-    return render(request, 'payment.html', context)
+
+                return render(request, 'payment.html', context)
 
 
 @require_POST

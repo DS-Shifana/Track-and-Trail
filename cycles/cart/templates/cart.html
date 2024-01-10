@@ -61,8 +61,9 @@
                             <small class="text-muted">$ {{ cart_item.variation.price }} each</small>   
                             {% endif %}
                         </td>
-                        <td class="py-1">
-                            <div class="d-flex input-group input-spinner col-6">
+                        <td  style="height: 1rem; ">
+                            <div class="d-flex align-items-center  h-100">
+                            <div class="d-flex  input-spinner col-6">
                                 <div class="input-group-prepend">
                                     <a href="{% url 'decrement_cartItem' cart_item.variation.id cart_item.id %}">
                                         <button type="submit" style="min-width: 26px" class="btn btn-decrement btn-spinner mx-3 update-cart" name="action" value="remove">
@@ -70,7 +71,8 @@
                                         </button>
                                     </a>
                                 </div>
-                                <input type="text" value="{{ cart_item.quantity }}" required class="form-control text-center quantity-input" name="quantity">
+                                <!-- form-control -->
+                                <input type="text" value="{{ cart_item.quantity }}" style="width: 1.8rem;" required class=" text-center quantity-input" name="quantity">
                                 <div class="input-group-append">
                                     <a href="{% url 'increment_cartItem' cart_item.variation.id %}">
                                         <button type="submit" style="min-width: 26px" class="btn btn-increment btn-spinner mx-3 update-cart" name="action" value="add">
@@ -79,6 +81,7 @@
                                     </a>
                                 </div>
                             </div>
+                        </div>
                         </td>
                         {% if cart_item.variation.stock_quantity == 0 %}
                             <td class="py-5">

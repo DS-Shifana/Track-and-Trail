@@ -30,7 +30,7 @@
   <link href="{% static 'admin/assets/vendor/simple-datatables/style.css' %}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+  <link href="{% static 'admin/assets/css/style.css' %}" rel="stylesheet">
 
   <!-- =======================================================
   * Template Name: Track&TrailAdmin
@@ -135,28 +135,38 @@
   <main id="main" class="main">
 
     <div class="pagetitle mx-5">
-      <h1>Coupons</h1>
+      <h1>Offers</h1>
       <nav>
         <div class="row">
             <div class="col-sm-6">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                    <li class="breadcrumb-item active">Coupons</li>
+                    <li class="breadcrumb-item active">Offers</li>
                 </ol>
             </div>
           
         </div>
     </nav>
     </div><!-- End Page Title -->
-
+    <div class="message-box text-danger">
+      {% if messages %}
+          <div class="message-box text-danger ">
+              {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }}">
+                      {{ message }}
+                  </div>
+              {% endfor %}
+          </div>
+      {% endif %}
+    </div>
     <section class="section mx-5">
         <div class="card mx-5">
             <div class="card-header mb-5">
-                <h5 class="card-title mx-5">Edit Coupon</h5>
+                <h5 class="card-title mx-5">Edit Offers</h5>
             </div>
             <div class="card-body mx-5">
                 <!-- Vertical Form -->
-                <form method="post" action="#" class="row g-3">
+                <form method="post" action="{%url 'edit_offer' offer.id%}" class="row g-3">
                     {% csrf_token %}
                     <div class="row ">
                         <div class="col-md-6">

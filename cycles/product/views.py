@@ -1,6 +1,7 @@
 from datetime import date
 import datetime
 from os import name
+from django.forms import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
@@ -44,39 +45,68 @@ def add_element(request):
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def add_product(request):
+    error_message = None  # Initialize error message
+    categories = Category.objects.filter(is_deleted=False) 
+    brands = Brand.objects.filter(is_deleted=False) 
+    offers = Offers.objects.filter(is_active=True)
+    
+
     if request.method == 'POST':
-        
+    
         name = request.POST.get('name')
         description = request.POST.get('description')
         category_id = request.POST.get('category')
         brand_id = request.POST.get('brand')
         offer_id = request.POST.get('offer')
         size = request.POST.get('size')
-        
-        category = Category.objects.get(pk=category_id)
-        brand = Brand.objects.get(pk=brand_id)
-        if offer_id:
-            offer = Offers.objects.get(pk=offer_id)
-        else:
-            offer = None    
 
-        product=Product(name = name,
-        description = description,
-        category = category,
-        brand = brand,
-        offer = offer,
-        size = size
-        )
-        product.save()
-        
         images = request.FILES.getlist('image')
 
-        for image in images:
-            ProductImage.objects.create(product=product,image=image)
-        return redirect('products')
 
-    return render(request, 'your_template.html')
+        if not name or not description or not name.strip() or not description.strip():
+            messages.error(request, "Name and description cannot be empty or contain only whitespaces.")
+            context = {
+                'categories': categories,
+                'brands': brands,
+                'offers': offers,
+                'error_message': error_message
+            }
 
+            return render(request, 'Adding_products.html', context)
+
+        if not images:
+            messages.error(request, "At least one image must be provided.") 
+            context = {
+                'categories': categories,
+                'brands': brands,
+                'offers': offers,
+                'error_message': error_message
+            }
+
+            return render(request, 'Adding_products.html', context)
+
+        else:    
+
+            category = Category.objects.get(pk=category_id)
+            brand = Brand.objects.get(pk=brand_id)
+            offer = Offers.objects.get(pk=offer_id) if offer_id else None
+
+            product = Product(
+                name=name.strip(),  # Remove leading and trailing whitespaces
+                description=description.strip(),  # Remove leading and trailing whitespaces
+                category=category,
+                brand=brand,
+                offer=offer,
+                size=size
+            )
+            product.save()
+
+            for image in images:
+                ProductImage.objects.create(product=product, image=image)
+
+    return redirect('products')
+    
+    
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def edit_element(request,id):
@@ -137,11 +167,24 @@ def update(request, id):
 
         for image in images:
             ProductImage.objects.create(product=product,image=image)
+        img_exist =ProductImage.objects.filter(product=product)  
+            
+        if not name or not description or not name.strip() or not description.strip():
+            messages.error(request, "Name and description cannot be empty or contain only whitespaces.")
+            return redirect('edit_element',id)
+ 
+        elif not img_exist:
+            messages.error(request, "Should be add images.") 
+            return redirect('edit_element',id)
+        elif len(img_exist) != 4:
+                messages.error(request, "Exactly four images must be provided.")
+                return redirect('edit_element',id)
+        else:
+         product.save()
+       
 
-        product.save()
-        return redirect('products')
+    return redirect('products')
 
-    return render(request, 'products.html')
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def unlist(request, id):
@@ -229,10 +272,10 @@ def update_varient(request,id):
                 varient.save()
             return redirect('varient',varient.product.id)  
         else:
-            messages.error(request, 'Form submission failed. Please check the form.')
+            messages.error(request, "Form submission failed due to empty fields. Please fill in all the required information.")
     
     
-    return redirect('edit_varient')
+    return redirect('edit_varient', varient_id=varient.id)
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def delete_varient(request,varient_id):
@@ -279,6 +322,12 @@ def category_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         name = name.capitalize()
+        name = name.strip()
+
+        if not name:
+            messages.error(request, 'Category name should not be empty')
+            return redirect('category')
+        
         category = Category(name=name)
         category.save()
         return redirect('category')  
@@ -299,6 +348,11 @@ def category_update(request, id):
     if request.method == "POST":
         name = request.POST.get('name')
         name = name.capitalize()
+        name = name.strip()
+
+        if not name:
+            messages.error(request, 'Category name should not be empty')
+            return redirect('category')
 
         category = Category(
             id=id,
@@ -358,45 +412,53 @@ def brand(request):
         }
         return render(request, 'brand.html', context)
     return redirect('adminlogin')
-
 @user_passes_test(is_admin, login_url='adminlogin')
 def brand_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         name = name.upper()
-        brand = Brand(name=name)
-        brand.save()
-        return redirect('brand')  
+        name = name.strip()  # Assign the result back to name
+        if not name:  # Use not name instead of name is None
+            messages.error(request, 'Brand name should not be empty')
+            return redirect('brand')
+        else:
+            brand = Brand(name=name)
+            brand.save()
+            messages.success(request, 'Brand added successfully')  # Add a success message
+            return redirect('brand')
+    
     return redirect('brand')
+
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def brand_edit(request, id):
-    brand = Brand.objects.all()
+    brand = get_object_or_404(Brand, id=id)
     
-
     context = {
-        'brand':brand,
-        
+        'brand': brand,
     }
-    return render(request, 'brand.html', context)
+    return render(request, 'brand_edit.html', context)
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def brand_update(request, id):
+    brand = get_object_or_404(Brand, id=id)
+
     if request.method == "POST":
         name = request.POST.get('name')
         name = name.upper()
+        name = name.strip()
 
-        brand = Brand(
-            id=id,
-            name=name
+        if not name:
+            messages.error(request, 'Brand name should not be empty')
+            return redirect('brand')
 
-        )
-
+        brand.name = name
         brand.save()
+        messages.success(request, 'Brand updated successfully')
         return redirect('brand')
 
-    
-    return redirect(request,'brand.html')
+    return redirect('brand_edit',id=id)
+
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def brand_delete(request,id):
@@ -454,18 +516,34 @@ def order(request, item_id=None):
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def coupon(request):
-    
+    coupons = Coupon.objects.all()
+
     if request.method == 'POST':
         form = CouponForm(request.POST)
         if form.is_valid():
             coupon = form.save(commit=False)
+            coupon.code.strip()
+            if coupon.code is None:
+                messages.error(request, 'Form validation is failed.Code should not be empty,Minimum purchase anoumt and discount amount should be non negative')    
+
+                messages.error(request, 'Form validation failed. Code field should not be empty')
+                return redirect('coupon')
+            elif coupon.min_purchase_amount < 0:
+                messages.error(request, 'Minimum purchase amount should be non-negative')
+                return redirect('coupon')
+            elif coupon.discount_amount < 0:
+                messages.error(request, 'Discount amount should be non-negative')
+                return redirect('coupon')
+
             if coupon.valid_upto and coupon.valid_upto.date() < date.today():
                 coupon.is_active = False
-            else:    
+            else:
                 coupon.is_active = True
             coupon.save()  # Save each coupon after updating is_active
             form.save()  # Save the new coupon
+            messages.success(request, 'Coupon added successfully.')
             return redirect(reverse('coupon'))
+
     else:
         form = CouponForm()
         coupon_True = Coupon.objects.filter(is_active=True)
@@ -473,9 +551,9 @@ def coupon(request):
             if coupon_active.valid_upto and coupon_active.valid_upto.date() < date.today():
                 coupon_active.is_active = False
             coupon_active.save()  # Save each coupon after updating is_active
-        coupons = Coupon.objects.all()        
 
     return render(request, 'coupon_management.html', {'coupons': coupons, 'form': form})
+
 
 @user_passes_test(is_admin, login_url='adminlogin')
 def delete_coupon(request,coupon_id):
@@ -493,6 +571,19 @@ def edit_coupon(request, coupon_id=None):
         form = CouponForm(request.POST, instance=coupon)
         if form.is_valid():
             coupon = form.save(commit=False)
+            coupon.code.strip()
+            if coupon.code is None:
+                messages.error(request, 'Form validation is failed.Code should not be empty,Minimum purchase anoumt and discount amount should be non negative')    
+
+                messages.error(request, 'Form validation failed. Code field should not be empty')
+                return redirect(reverse('edit_coupon', args=[coupon_id]))
+
+            elif coupon.min_purchase_amount < 0:
+                messages.error(request, 'Minimum purchase amount should be non-negative')
+                return redirect(reverse('edit_coupon', args=[coupon_id]))
+            elif coupon.discount_amount < 0:
+                messages.error(request, 'Discount amount should be non-negative')
+                return redirect(reverse('edit_coupon', args=[coupon_id]))
             
             if coupon.valid_upto and coupon.valid_upto.date() < date.today():
                 coupon.is_active = False
@@ -520,9 +611,21 @@ def offers(request):
                 offer.is_active = True
             else:
                 offer.is_active = False    
-
+            if offer.start_date and offer.end_date and offer.start_date >= offer.end_date:
+                messages.error(request,"End date must be greater than the start date.")
+                return redirect(reverse('offers')) 
+            
+            elif offer.start_date and offer.start_date < timezone.now():
+                messages.error(request,"Start date must be in the future.")
+                return redirect(reverse('offers')) 
+            else:
+                if not offer.percentage or len(str(offer.percentage)) > 2:
+                    messages.error(request, 'Invalid discount percentage')
+                    return redirect(reverse('offers'))
             offer.save()
-            return redirect(reverse('offers'))  
+            return redirect(reverse('offers'))             
+        else:
+            messages.error(request,'Form submission is failed,Fields should not be empty or non negative value for discount persentage') 
     else:
         form = OffersForm()
 
@@ -559,6 +662,21 @@ def edit_offer(request, offer_id):
                 offer.is_active = True
             else:
                 offer.is_active = False
+            if offer.start_date <= timezone.now() and offer.end_date > timezone.now():
+                offer.is_active = True
+            else:
+                offer.is_active = False    
+            if offer.start_date and offer.end_date and offer.start_date >= offer.end_date:
+                messages.error(request,"End date must be greater than the start date.")
+                return render(request, 'edit_offer.html', {'offer':offer,'form': form}) 
+            
+            elif offer.start_date and offer.start_date < timezone.now():
+                messages.error(request,"Start date must be in the future.")
+                return render(request, 'edit_offer.html', {'offer':offer,'form': form}) 
+            else:
+                if not offer.percentage or len(str(offer.percentage)) > 2:
+                    messages.error(request, 'Invalid discount percentage')
+                    return render(request, 'edit_offer.html', {'offer':offer,'form': form})    
             offer.save()
             return redirect('offers')
     else:

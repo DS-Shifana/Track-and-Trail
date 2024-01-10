@@ -148,7 +148,17 @@
         </div>
     </nav>
     </div><!-- End Page Title -->
-
+    <div class="message-box text-danger">
+      {% if messages %}
+        <div class="message-box text-danger ">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+  </div>
     <section class="section mx-5">
         <div class="card mx-5">
             <div class="card-header">

@@ -62,6 +62,8 @@ MIDDLEWARE = [
     
 ]
 
+
+
 ROOT_URLCONF = 'cycles.urls'
 
 TEMPLATES = [
