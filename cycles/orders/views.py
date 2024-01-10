@@ -150,7 +150,7 @@ def payment(request, quantity=0):
                 context['coupons'] = coupons
 
 
-                return render(request, 'payment.html', context)
+    return render(request, 'payment.html', context)
 
 
 @require_POST
