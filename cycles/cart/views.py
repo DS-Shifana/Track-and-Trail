@@ -30,6 +30,7 @@ def cart(request, total=0, quantity=0, cart_item=None):
             if cart_item and cart_item.product:
                 total += cart_item.sub_total()
                 quantity += cart_item.quantity
+                 
         for cart_item in cart_items:        
                 if cart_item.variation.stock_quantity == 0:
                     checkout_enable = False
@@ -74,9 +75,8 @@ def add_to_cart(request, variant_id):
                 cart_item.quantity += 1
                 if variation.stock_quantity == 0:
                     checkout = True
-                # variation.save()
-                wishlist_items = Wishlist.objects.filter(user=request.user,product=product)  
-                wishlist_items.delete()     
+                wishlist_item = Wishlist.objects.filter(user=request.user,product=cart_item.product,variation=cart_item.variation)  
+                wishlist_item.delete()    
                 cart_item.save()
             else:
                 cart_item = CartItem.objects.create(
@@ -87,9 +87,10 @@ def add_to_cart(request, variant_id):
                     variation = variation,
                 )
 
-                # variation.stock_quantity -= 1
-                # variation.save()
+                wishlist_item = Wishlist.objects.filter(user=request.user,product=cart_item.product,variation=cart_item.variation)  
+                wishlist_item.delete()
                 cart_item.save()
+
             return redirect('cart')
         return redirect('product_detail',product_id)
         
