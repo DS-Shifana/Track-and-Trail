@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime,timedelta
 from itertools import count
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
@@ -150,8 +150,11 @@ def report(request):
         end_date_str = request.POST.get('endDate')
 
         # Convert string representations of dates to datetime objects
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+        if start_date == end_date:
+            end_date += timedelta(days=1)
 
         # Filter OrderItem objects based on the date range
         order_items = OrderItem.objects.filter(created_at__range=(start_date, end_date))
