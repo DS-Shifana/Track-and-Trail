@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from datetime import timedelta
 from django.contrib import messages
 from adminpanel.models import Offers
 from orders.models import Order, OrderItem
@@ -615,9 +616,9 @@ def offers(request):
                 messages.error(request,"End date must be greater than the start date.")
                 return redirect(reverse('offers')) 
             
-            elif offer.start_date and offer.start_date < timezone.now():
-                messages.error(request,"Start date must be in the future.")
-                return redirect(reverse('offers')) 
+            elif offer.end_date and offer.end_date < timezone.now():
+                messages.error(request,"End date must be in the future.")
+                return render(request, 'edit_offer.html', {'offer':offer,'form': form}) 
             else:
                 if not offer.percentage or len(str(offer.percentage)) > 2:
                     messages.error(request, 'Invalid discount percentage')
@@ -653,7 +654,7 @@ def delete_offer(request,offer_id):
 @user_passes_test(is_admin, login_url='adminlogin')
 def edit_offer(request, offer_id):
     offer = Offers.objects.get(id=offer_id)
-
+    
     if request.method == 'POST':
         form = OffersForm(request.POST, instance=offer)
         if form.is_valid():
@@ -670,8 +671,8 @@ def edit_offer(request, offer_id):
                 messages.error(request,"End date must be greater than the start date.")
                 return render(request, 'edit_offer.html', {'offer':offer,'form': form}) 
             
-            elif offer.start_date and offer.start_date < timezone.now():
-                messages.error(request,"Start date must be in the future.")
+            elif offer.end_date and offer.end_date < timezone.now():
+                messages.error(request,"End date must be in the future.")
                 return render(request, 'edit_offer.html', {'offer':offer,'form': form}) 
             else:
                 if not offer.percentage or len(str(offer.percentage)) > 2:
