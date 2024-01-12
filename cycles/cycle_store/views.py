@@ -117,12 +117,24 @@ def signup(request):
         pass2 = request.POST.get('pass2')
         referral_code = request.POST.get('referrel_code')
 
-        request.session['fname'] = fname
-        request.session['lname'] = lname
-        request.session['username']=username
-        request.session['password']=pass1
-        request.session['email']=email
-        request.session['referral_code']=referral_code
+        request.session['fname'] = fname.strip()
+        request.session['lname'] = lname.strip()
+        request.session['username']=username.strip()
+        request.session['password']=pass1.strip()
+        request.session['email']=email.strip()
+        request.session['referral_code']=referral_code.strip()
+
+        if not all([fname.strip(), lname.strip(), username.strip(),pass1.strip()]):
+            messages.error(request, 'Form submission is failed. Fill all the fields')
+            return redirect('signup')
+        else:
+            email = email.strip()
+            
+            if email.startswith("@") and email.endswith(".com"):
+                messages.error(request, 'Invalide Emil!Should be ensure email is valid submit.')
+                return redirect('signup')
+                
+
 
         if pass1==pass2:
             if User.objects.filter(username=username).exists():

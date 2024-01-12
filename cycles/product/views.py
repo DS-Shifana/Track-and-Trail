@@ -525,8 +525,6 @@ def coupon(request):
             coupon = form.save(commit=False)
             coupon.code.strip()
             if coupon.code is None:
-                messages.error(request, 'Form validation is failed.Code should not be empty,Minimum purchase anoumt and discount amount should be non negative')    
-
                 messages.error(request, 'Form validation failed. Code field should not be empty')
                 return redirect('coupon')
             elif coupon.min_purchase_amount < 0:
@@ -553,7 +551,7 @@ def coupon(request):
                 coupon_active.is_active = False
             coupon_active.save()  # Save each coupon after updating is_active
 
-    return render(request, 'coupon_management.html', {'coupons': coupons, 'form': form})
+    return render(request, 'coupon_management.html', {'coupons': coupons, 'form': form, 'messages': messages.get_messages(request)})
 
 
 @user_passes_test(is_admin, login_url='adminlogin')
